@@ -1,0 +1,234 @@
+name: Deployment
+
+on:
+  workflow_dispatch: {}
+    # inputs:
+    #   environment:
+    #     type: choice
+    #     description: Select target environment
+    #     options:
+    #     - nonprod
+    #     - prod
+
+env:
+  KONNECT_API_KEY_DEV: ${{ secrets.KONNECT_API_KEY_DEV }}
+  KONNECT_CONTROL_PLANE_NAME_DEV: ${{ vars.KONNECT_CONTROL_PLANE_NAME_DEV }}
+  KONNECT_API_KEY_STAGING: ${{ secrets.KONNECT_API_KEY_STAGING }}
+  KONNECT_CONTROL_PLANE_NAME_STAGING: ${{ vars.KONNECT_CONTROL_PLANE_NAME_STAGING }}
+  KONNECT_API_KEY_PROD: ${{ secrets.KONNECT_API_KEY_PROD }}
+  KONNECT_CONTROL_PLANE_NAME_PROD: ${{ vars.KONNECT_CONTROL_PLANE_NAME_PROD }}
+  KONNECT_REGION: ${{ vars.KONNECT_REGION }}
+  API_TAG: ${{ github.event.repository.name }}
+
+jobs:
+  # Commit the sync straight to dev
+  sync-dev:
+    environment:
+      name: dev
+
+    runs-on: ubuntu-latest
+    container:
+      image: kong/deck:v1.35.0
+      options: "--user root --cpus 1"
+      volumes:
+        - ./:/repository
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: OpenAPI to Kong
+        run: |
+          mkdir -p /repository/output/
+
+          echo "-> Generating decks from all API specs"
+
+          for API_SPEC_PATH in /repository/apis/*.yaml; do
+            export API_SPEC_FILENAME=$(basename $API_SPEC_PATH)
+
+            deck file openapi2kong \
+              -s $API_SPEC_PATH \
+              -o /repository/output/$API_SPEC_FILENAME \
+              --select-tag $API_TAG
+
+            echo "-> Genarated Kong config from ${API_SPEC_FILENAME}"
+          done
+
+      - name: Deck Sync on dev
+        run: |
+          echo "-> Sync'ing against control plane '${KONNECT_CONTROL_PLANE_NAME_DEV}' in region '${KONNECT_REGION}'"
+
+          deck --konnect-addr="https://${KONNECT_REGION}.api.konghq.com" \
+              --konnect-token="${KONNECT_API_KEY_DEV}" \
+              --konnect-control-plane-name="${KONNECT_CONTROL_PLANE_NAME_DEV}" \
+              --select-tag="${API_TAG}" \
+              gateway sync /repository/output
+
+  diff-staging:
+    needs:
+      - sync-dev
+
+    runs-on: ubuntu-latest
+    container:
+      image: kong/deck:v1.35.0
+      options: "--user root --cpus 1"
+      volumes:
+        - ./:/repository
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: OpenAPI to Kong
+        run: |
+          mkdir -p /repository/output/
+
+          echo "-> Generating decks from all API specs"
+
+          for API_SPEC_PATH in /repository/apis/*.yaml; do
+            export API_SPEC_FILENAME=$(basename $API_SPEC_PATH)
+
+            deck file openapi2kong \
+              -s $API_SPEC_PATH \
+              -o /repository/output/$API_SPEC_FILENAME \
+              --select-tag $API_TAG
+
+            echo "-> Genarated Kong config from ${API_SPEC_FILENAME}"
+          done
+
+      - name: Deck Diff on staging
+        run: |
+          echo "-> Diff'ing against control plane '${KONNECT_CONTROL_PLANE_NAME_STAGING}' in region '${KONNECT_REGION}'"
+
+          deck --konnect-addr="https://${KONNECT_REGION}.api.konghq.com" \
+              --konnect-token="${KONNECT_API_KEY_STAGING}" \
+              --konnect-control-plane-name="${KONNECT_CONTROL_PLANE_NAME_STAGING}" \
+              --select-tag="${API_TAG}" \
+              gateway diff /repository/output
+
+  sync-staging:
+    needs:
+      - diff-staging
+
+    environment:
+      name: staging
+
+    runs-on: ubuntu-latest
+    container:
+      image: kong/deck:v1.35.0
+      options: "--user root --cpus 1"
+      volumes:
+        - ./:/repository
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: OpenAPI to Kong
+        run: |
+          mkdir -p /repository/output/
+
+          echo "-> Generating decks from all API specs"
+
+          for API_SPEC_PATH in /repository/apis/*.yaml; do
+            export API_SPEC_FILENAME=$(basename $API_SPEC_PATH)
+
+            deck file openapi2kong \
+              -s $API_SPEC_PATH \
+              -o /repository/output/$API_SPEC_FILENAME \
+              --select-tag $API_TAG
+
+            echo "-> Genarated Kong config from ${API_SPEC_FILENAME}"
+          done
+
+      - name: Deck Sync on staging
+        run: |
+          echo "-> Sync'ing against control plane '${KONNECT_CONTROL_PLANE_NAME_STAGING}' in region '${KONNECT_REGION}'"
+
+          deck --konnect-addr="https://${KONNECT_REGION}.api.konghq.com" \
+              --konnect-token="${KONNECT_API_KEY_STAGING}" \
+              --konnect-control-plane-name="${KONNECT_CONTROL_PLANE_NAME_STAGING}" \
+              --select-tag="${API_TAG}" \
+              gateway sync /repository/output
+
+  diff-production:
+    needs:
+      - sync-staging
+
+    runs-on: ubuntu-latest
+    container:
+      image: kong/deck:v1.35.0
+      options: "--user root --cpus 1"
+      volumes:
+        - ./:/repository
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: OpenAPI to Kong
+        run: |
+          mkdir -p /repository/output/
+
+          echo "-> Generating decks from all API specs"
+
+          for API_SPEC_PATH in /repository/apis/*.yaml; do
+            export API_SPEC_FILENAME=$(basename $API_SPEC_PATH)
+
+            deck file openapi2kong \
+              -s $API_SPEC_PATH \
+              -o /repository/output/$API_SPEC_FILENAME \
+              --select-tag $API_TAG
+
+            echo "-> Genarated Kong config from ${API_SPEC_FILENAME}"
+          done
+
+      - name: Deck Diff on production
+        run: |
+          echo "-> Diff'ing against control plane '${KONNECT_CONTROL_PLANE_NAME_PROD}' in region '${KONNECT_REGION}'"
+
+          deck --konnect-addr="https://${KONNECT_REGION}.api.konghq.com" \
+              --konnect-token="${KONNECT_API_KEY_PROD}" \
+              --konnect-control-plane-name="${KONNECT_CONTROL_PLANE_NAME_PROD}" \
+              --select-tag="${API_TAG}" \
+              gateway diff /repository/output
+
+  sync-production:
+    needs:
+      - diff-production
+
+    environment:
+      name: prod
+
+    runs-on: ubuntu-latest
+    container:
+      image: kong/deck:v1.35.0
+      options: "--user root --cpus 1"
+      volumes:
+        - ./:/repository
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: OpenAPI to Kong
+        run: |
+          mkdir -p /repository/output/
+
+          echo "-> Generating decks from all API specs"
+
+          for API_SPEC_PATH in /repository/apis/*.yaml; do
+            export API_SPEC_FILENAME=$(basename $API_SPEC_PATH)
+
+            deck file openapi2kong \
+              -s $API_SPEC_PATH \
+              -o /repository/output/$API_SPEC_FILENAME \
+              --select-tag $API_TAG
+
+            echo "-> Genarated Kong config from ${API_SPEC_FILENAME}"
+          done
+
+      - name: Deck Sync on production
+        run: |
+          echo "-> Sync'ing against control plane '${KONNECT_CONTROL_PLANE_NAME_PROD}' in region '${KONNECT_REGION}'"
+
+          deck --konnect-addr="https://${KONNECT_REGION}.api.konghq.com" \
+              --konnect-token="${KONNECT_API_KEY_PROD}" \
+              --konnect-control-plane-name="${KONNECT_CONTROL_PLANE_NAME_PROD}" \
+              --select-tag="${API_TAG}" \
+              gateway sync /repository/output
