@@ -1,0 +1,19 @@
+name: pull-request
+on:
+  - pull_request
+jobs:
+  container-test-job:
+    runs-on: ubuntu-latest
+    container:
+      image: busybox
+      env:
+        NODE_ENV: development
+      ports:
+        - 80
+      volumes:
+        - ./:/host
+      options: --cpus 1
+    steps:
+      - name: Hi
+        run: |
+          echo hi
