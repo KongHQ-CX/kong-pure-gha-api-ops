@@ -3,23 +3,69 @@ on:
   - pull_request
 env:
   KONNECT_API_KEY_NONPROD: ${{ secrets.KONNECT_API_KEY_NONPROD }}
+  KONNECT_CONTROL_PLANE_NAME: ${{ vars.KONNECT_CONTROL_PLANE_NAME }}
+  KONNECT_CONTROL_PLANE_REGION: ${{ vars.KONNECT_CONTROL_PLANE_REGION }}
+  API_TAG: ${{ github.event.repository.name }}
 jobs:
-  openapi-to-kong:
+  diff-control-plane:
     runs-on: ubuntu-latest
 
     container:
       image: kong/deck:v1.35.0
-      options: "--user root --cpus 1"
+      options: "--user root --cpus 1"  # run as root doesn't matter, we can't do anything bad
       volumes:
-        - ./:/host
+        - ./:/repository
     steps:
       - uses: actions/checkout@v4
-      - name: openapi-2-kong
+      - name: OpenAPI to Kong
         run: |
-          mkdir -p /host/output/
-          for API_SPEC_PATH in /host/apis/*.yaml; do
+          mkdir -p /repository/output/
+          echo "---" > out.txt
+
+          echo "-> Generating decks from all API specs"
+
+          for API_SPEC_PATH in /repository/apis/*.yaml; do
             export API_SPEC_FILENAME=$(basename $API_SPEC_PATH)
-            deck file openapi2kong -s $API_SPEC_PATH -o /host/output/$API_SPEC_FILENAME
+
+            deck file openapi2kong \
+              -s $API_SPEC_PATH \
+              -o /repository/output/$API_SPEC_FILENAME \
+              --select-tag $API_TAG
+
+            echo "-> Genarated Kong config from ${API_SPEC_FILENAME}"
           done
 
-          cat output/*
+      - name: Deck Diff
+        run: |
+          echo "-> Diff'ing against control plane '${KONNECT_CONTROL_PLANE_NAME}' in region '${KONNECT_CONTROL_PLANE_REGION}'"
+
+          deck --konnect-address="https://${KONNECT_CONTROL_PLANE_REGION}.api.konghq.com" \
+               --konnect-token="${KONNECT_API_KEY_NONPROD}" \
+               --konnect-control-plane-name="${KONNECT_CONTROL_PLANE_NAME}" \
+               --select-tag="${API_TAG}" \
+               gateway diff /repository/output >> out.txt
+
+          echo "-> Producing pull request comment"
+
+          cat <<EOF > out2.txt
+          When merged to main, the following **APIs** will be committed to Konnect nonprod!
+
+          Please make sure all of the necessary approvals are in place before merging.
+
+          \`\`\`
+          $(cat out.txt)
+          \`\`\`
+
+          EOF
+
+      - name: PR Comment
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Please change PR Title!!'
+            })
