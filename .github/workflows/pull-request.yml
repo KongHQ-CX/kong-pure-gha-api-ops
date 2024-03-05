@@ -64,7 +64,7 @@ jobs:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             const fs = require('fs')
-            const comment = fs.readFileSync('/repository/out.txt')
+            const comment = fs.readFileSync('/repository/out.txt', "utf8")
             console.log(`json string ${comment}`)
 
             github.rest.issues.createComment({
