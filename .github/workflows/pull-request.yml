@@ -9,9 +9,9 @@ jobs:
 
     container:
       image: kong/deck:v1.35.0
+      options: "--user root --cpus 1"
       volumes:
         - ./:/host
-      options: --cpus 1
     steps:
       - uses: actions/checkout@v4
       - name: openapi-2-kong
