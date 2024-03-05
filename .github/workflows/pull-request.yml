@@ -15,10 +15,10 @@ jobs:
     steps:
       - name: openapi-2-kong
         run: |
-          mkdir -p output/
+          mkdir -p /host/output/
           for API_SPEC_PATH in /host/apis/*.yaml; do
             export API_SPEC_FILENAME=$(basename $API_SPEC_PATH)
-            deck file openapi2kong -s $API_SPEC_PATH -o output/$API_SPEC_FILENAME
+            deck file openapi2kong -s $API_SPEC_PATH -o /host/output/$API_SPEC_FILENAME
           done
 
           cat output/*
