@@ -7,13 +7,11 @@ jobs:
     container:
       image: busybox
       env:
-        NODE_ENV: development
-      ports:
-        - 80
+        KONNECT_API_KEY_NONPROD: ${{ secrets.KONNECT_API_KEY_NONPROD }}  
       volumes:
         - ./:/host
       options: --cpus 1
     steps:
       - name: Hi
         run: |
-          echo hi
+          echo $KONNECT_API_KEY_NONPROD
