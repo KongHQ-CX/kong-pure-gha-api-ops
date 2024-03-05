@@ -15,6 +15,9 @@ jobs:
     steps:
       - name: openapi-2-kong
         run: |
+          ls -la /
+          ls -la /host
+          ls -la /host/apis
           cat /host/apis/*.yaml
           mkdir -p /host/output/
           for API_SPEC_PATH in /host/apis/*.yaml; do
