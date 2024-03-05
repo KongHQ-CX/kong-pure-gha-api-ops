@@ -47,7 +47,7 @@ jobs:
 
           echo "-> Producing pull request comment"
 
-          cat <<EOF > out2.txt
+          cat <<EOF > comment.txt
           When merged to main, the following **APIs** will be committed to Konnect nonprod!
 
           Please make sure all of the necessary approvals are in place before merging.
@@ -64,7 +64,7 @@ jobs:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             const fs = require('fs')
-            const comment = fs.readFileSync('/repository/out.txt', "utf8")
+            const comment = fs.readFileSync('/repository/comment.txt', "utf8")
             console.log(`json string ${comment}`)
 
             github.rest.issues.createComment({
