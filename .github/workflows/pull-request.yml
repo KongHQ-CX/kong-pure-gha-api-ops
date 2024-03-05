@@ -13,12 +13,9 @@ jobs:
         - ./:/host
       options: --cpus 1
     steps:
+      - uses: actions/checkout@v4
       - name: openapi-2-kong
         run: |
-          ls -la /
-          ls -la /host
-          ls -la /host/apis
-          cat /host/apis/*.yaml
           mkdir -p /host/output/
           for API_SPEC_PATH in /host/apis/*.yaml; do
             export API_SPEC_FILENAME=$(basename $API_SPEC_PATH)
