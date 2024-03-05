@@ -39,7 +39,7 @@ jobs:
         run: |
           echo "-> Diff'ing against control plane '${KONNECT_CONTROL_PLANE_NAME}' in region '${KONNECT_CONTROL_PLANE_REGION}'"
 
-          deck --konnect-address="https://${KONNECT_CONTROL_PLANE_REGION}.api.konghq.com" \
+          deck --konnect-addr="https://${KONNECT_CONTROL_PLANE_REGION}.api.konghq.com" \
                --konnect-token="${KONNECT_API_KEY_NONPROD}" \
                --konnect-control-plane-name="${KONNECT_CONTROL_PLANE_NAME}" \
                --select-tag="${API_TAG}" \
