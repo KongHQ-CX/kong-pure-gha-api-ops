@@ -1,17 +1,24 @@
 name: pull-request
 on:
   - pull_request
+env:
+  KONNECT_API_KEY_NONPROD: ${{ secrets.KONNECT_API_KEY_NONPROD }}
 jobs:
-  container-test-job:
+  openapi-to-kong:
     runs-on: ubuntu-latest
+
     container:
-      image: busybox
-      env:
-        KONNECT_API_KEY_NONPROD: ${{ secrets.KONNECT_API_KEY_NONPROD }}  
+      image: kong/deck:v1.35.0
       volumes:
         - ./:/host
       options: --cpus 1
     steps:
-      - name: Hi
+      - name: openapi-2-kong
         run: |
-          echo $KONNECT_API_KEY_NONPROD
+          mkdir -p output/
+          for API_SPEC_PATH in /host/apis/*.yaml; do
+            export API_SPEC_FILENAME=$(basename $API_SPEC_PATH)
+            deck file openapi2kong -s $API_SPEC_PATH -o output/$API_SPEC_FILENAME
+          done
+
+          cat output/*
