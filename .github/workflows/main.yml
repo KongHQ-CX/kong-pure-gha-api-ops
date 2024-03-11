@@ -13,8 +13,6 @@ jobs:
     container:
       image: ubuntu:22.04
       options: "--user root --cpus 1"  # run as root doesn't matter, we can't do any damage to GitHub
-      volumes:
-        - ./:/repository
     defaults:
       run:
          working-directory: /
@@ -26,8 +24,6 @@ jobs:
           #!/bin/bash
 
           apt update && apt install -y git zip unzip
-
-          cd /repository
 
           #get highest tag number
           VERSION=`git describe --abbrev=0 --tags`
