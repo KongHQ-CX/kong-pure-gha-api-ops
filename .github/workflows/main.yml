@@ -17,6 +17,7 @@ jobs:
         - ./:/repository
 
     steps:
+      - uses: actions/checkout@v4
       - name: "Determine tag"
         run: |
           #!/bin/bash
