@@ -1,0 +1,124 @@
+name: pull-request
+on:
+  - pull_request
+env:
+  KONNECT_API_KEY_NONPROD: ${{ secrets.KONNECT_API_KEY_NONPROD }}
+  KONNECT_CONTROL_PLANE_NAME: ${{ vars.KONNECT_CONTROL_PLANE_NAME }}
+  KONNECT_CONTROL_PLANE_REGION: ${{ vars.KONNECT_CONTROL_PLANE_REGION }}
+  API_TAG: ${{ github.event.repository.name }}
+jobs:
+  lint-api-specs:
+    runs-on: ubuntu-latest
+
+    container:
+      image: kong/inso:8.6.1
+      options: "--user root --cpus 1"  # run as root doesn't matter, we can't do any damage to GitHub
+      volumes:
+        - ./:/repository
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inso Lint
+        run: |
+          for API_SPEC_PATH in /repository/apis/*.yaml; do
+            export API_SPEC_FILENAME=$(basename $API_SPEC_PATH)
+
+            echo "==========================" >> lint.txt
+            echo "Linting $API_SPEC_FILENAME" >> lint.txt
+            echo "==========================" >> lint.txt
+
+            inso lint spec $API_SPEC_PATH >> lint.txt
+          done
+
+          echo "-> Producing pull request comment"
+
+          cat <<EOF > lint-comment.txt
+          
+          Lint results for all API specs:
+
+          \`\`\`
+          $(cat lint.txt)
+          \`\`\`
+
+          EOF
+
+      - name: PR Comment
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const fs = require('fs')
+            const comment = fs.readFileSync('/repository/lint-comment.txt', "utf8")
+            console.log(`json string ${comment}`)
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            })
+
+  diff-control-plane:
+    runs-on: ubuntu-latest
+
+    container:
+      image: kong/deck:v1.35.0
+      options: "--user root --cpus 1"
+      volumes:
+        - ./:/repository
+    steps:
+      - uses: actions/checkout@v4
+      - name: OpenAPI to Kong
+        run: |
+          mkdir -p /repository/output/
+
+          echo "-> Generating decks from all API specs"
+
+          for API_SPEC_PATH in /repository/apis/*.yaml; do
+            export API_SPEC_FILENAME=$(basename $API_SPEC_PATH)
+
+            deck file openapi2kong \
+              -s $API_SPEC_PATH \
+              -o /repository/output/$API_SPEC_FILENAME \
+              --select-tag $API_TAG
+
+            echo "-> Genarated Kong config from ${API_SPEC_FILENAME}"
+          done
+
+      - name: Deck Diff
+        run: |
+          echo "-> Diff'ing against control plane '${KONNECT_CONTROL_PLANE_NAME}' in region '${KONNECT_CONTROL_PLANE_REGION}'"
+
+          deck --konnect-addr="https://${KONNECT_CONTROL_PLANE_REGION}.api.konghq.com" \
+               --konnect-token="${KONNECT_API_KEY_NONPROD}" \
+               --konnect-control-plane-name="${KONNECT_CONTROL_PLANE_NAME}" \
+               --select-tag="${API_TAG}" \
+               gateway diff /repository/output >> out.txt
+
+          echo "-> Producing pull request comment"
+
+          cat <<EOF > comment.txt
+          This is a diff against Konnect NONPROD!
+
+          Please make sure all of the necessary approvals are in place before merging.
+
+          \`\`\`
+          $(cat out.txt)
+          \`\`\`
+
+          EOF
+
+      - name: PR Comment
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const fs = require('fs')
+            const comment = fs.readFileSync('/repository/comment.txt', "utf8")
+            console.log(`json string ${comment}`)
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            })

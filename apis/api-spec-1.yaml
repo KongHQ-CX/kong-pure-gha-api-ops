@@ -1,0 +1,35 @@
+openapi: 3.0.0
+info:
+  version: v1
+  title: Echo Server
+  description: A Simple Echo API
+servers:
+  - url: http://echo-server:8080/v1
+    description: Kong Production API Gateway Interface
+paths:
+  /v1/echo:
+    get:
+      description: Returns an echo
+      responses:
+        '200':
+          description: Successfully returns an echo
+        '500':
+          $ref: '#/components/responses/500Error'
+    post:
+      description: Returns a POST body echo
+      responses:
+        '200':
+          description: Successfully returns an echo
+        '500':
+          $ref: '#/components/responses/500Error'
+components:
+  responses:
+    500Error:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
