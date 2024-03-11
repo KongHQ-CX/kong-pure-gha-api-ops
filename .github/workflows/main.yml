@@ -24,6 +24,8 @@ jobs:
 
           apt update && apt install -y git zip unzip
 
+          cd /repository
+
           #get highest tag number
           VERSION=`git describe --abbrev=0 --tags`
           
