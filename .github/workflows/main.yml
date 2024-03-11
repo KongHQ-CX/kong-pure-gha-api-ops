@@ -15,6 +15,9 @@ jobs:
       options: "--user root --cpus 1"  # run as root doesn't matter, we can't do any damage to GitHub
       volumes:
         - ./:/repository
+    defaults:
+      run:
+         working-directory: /
 
     steps:
       - uses: actions/checkout@v4
