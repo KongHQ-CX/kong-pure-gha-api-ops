@@ -28,7 +28,7 @@ jobs:
           #get highest tag number
           VERSION=`git tag -l --sort -version:refname | head -n 1`
 
-          echo $VERSION
+          echo "ver: $VERSION"
           #replace . with space so can split into an array
           VERSION_BITS=(${VERSION//./ })
           
