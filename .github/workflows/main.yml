@@ -16,13 +16,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-tags: true
       - name: "Determine tag"
         run: |
           #!/bin/bash
           cd $GITHUB_WORKSPACE
 
-          git fetch origin main
-          git reset --hard origin/main
           git fetch origin 'refs/tags/*:refs/tags/*'
 
           #get highest tag number
