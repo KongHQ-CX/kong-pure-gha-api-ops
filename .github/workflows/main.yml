@@ -20,7 +20,7 @@ jobs:
         run: |
           #!/bin/bash
 
-          apt update && apt install -y git zip unzip
+          # apt update && apt install -y git zip unzip
 
           cd $GITHUB_WORKSPACE
 
