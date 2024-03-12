@@ -3,9 +3,11 @@ info:
   version: v1
   title: Echo Server
   description: A Simple Echo API
+
 servers:
   - url: http://echo-server:8080/v1
     description: Kong Production API Gateway Interface
+
 paths:
   /v1/echo:
     get:
