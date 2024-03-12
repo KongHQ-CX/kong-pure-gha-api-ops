@@ -10,9 +10,9 @@ jobs:
     name: "Create Release"
 
     runs-on: "ubuntu-latest"
-    container:
-      image: ubuntu:22.04
-      options: "--user root --cpus 1"  # run as root doesn't matter, we can't do any damage to GitHub
+    # container:
+    #   image: ubuntu:22.04
+    #   options: "--user root --cpus 1"  # run as root doesn't matter, we can't do any damage to GitHub
 
     steps:
       - uses: actions/checkout@v4
