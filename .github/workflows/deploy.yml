@@ -12,6 +12,9 @@ on:
 
 jobs:
   deploy:
+    environment:
+      name: ${{ inputs.environment }}
+
     runs-on: ubuntu-latest
     container:
       image: kong/deck:v1.35.0
@@ -25,3 +28,4 @@ jobs:
       - name: greet
         run: | 
           echo "environment is ${{ github.event.inputs.environment }} / ${{ inputs.environment }}"
+          echo "CP NAME IS ${{ vars.KONNECT_CONTROL_PLANE_NAME }}"

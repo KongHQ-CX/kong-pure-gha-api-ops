@@ -1,13 +1,14 @@
 name: pull-request
 on:
   - pull_request
-env:
-  KONNECT_API_KEY_NONPROD: ${{ secrets.KONNECT_API_KEY_NONPROD }}
-  KONNECT_CONTROL_PLANE_NAME: ${{ vars.KONNECT_CONTROL_PLANE_NAME }}
-  KONNECT_CONTROL_PLANE_REGION: ${{ vars.KONNECT_CONTROL_PLANE_REGION }}
-  API_TAG: ${{ github.event.repository.name }}
+
+
+
 jobs:
   lint-api-specs:
+    environment:
+      name: "nonprod"
+
     runs-on: ubuntu-latest
 
     container:
@@ -58,6 +59,15 @@ jobs:
             })
 
   diff-control-plane:
+    environment:
+      name: "nonprod"
+
+    env:
+      KONNECT_API_KEY_NONPROD: ${{ secrets.KONNECT_API_KEY_NONPROD }}
+      KONNECT_CONTROL_PLANE_NAME: ${{ vars.KONNECT_CONTROL_PLANE_NAME }}
+      KONNECT_CONTROL_PLANE_REGION: ${{ vars.KONNECT_CONTROL_PLANE_REGION }}
+      API_TAG: ${{ github.event.repository.name }}
+      
     runs-on: ubuntu-latest
 
     container:
