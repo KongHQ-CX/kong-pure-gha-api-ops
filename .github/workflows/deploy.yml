@@ -27,7 +27,7 @@ jobs:
       
       - name: Deck Sync on dev
         run: |
-          This would be a sync
+          echo "This would be a sync to dev"
 
 
   sync-nonprod:
@@ -48,7 +48,7 @@ jobs:
       
       - name: Deck Sync on nonprod
         run: |
-          This would be a sync to nonprod
+          echo "This would be a sync to nonprod"
 
   sync-prod:
     environment:
@@ -68,4 +68,4 @@ jobs:
       
       - name: Deck Sync on prod
         run: |
-          This would be a sync to prod
+          echo "This would be a sync to prod"
