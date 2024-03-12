@@ -19,10 +19,9 @@ jobs:
       - name: "Determine tag"
         run: |
           #!/bin/bash
-
-          # apt update && apt install -y git zip unzip
-
           cd $GITHUB_WORKSPACE
+
+          git fetch origin 'refs/tags/*:refs/tags/*'
 
           #get highest tag number
           VERSION=`git describe --abbrev=0 --tags`
