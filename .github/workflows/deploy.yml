@@ -1,19 +1,19 @@
 name: Deployment
 
 on:
-  workflow_dispatch:
-    inputs:
-      environment:
-        type: choice
-        description: Select target environment
-        options:
-        - nonprod
-        - prod
+  workflow_dispatch: {}
+    # inputs:
+    #   environment:
+    #     type: choice
+    #     description: Select target environment
+    #     options:
+    #     - nonprod
+    #     - prod
 
 jobs:
-  diff:
+  sync-dev:
     environment:
-      name: ${{ inputs.environment }}
+      name: dev
 
     runs-on: ubuntu-latest
     container:
@@ -25,30 +25,47 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       
-      - name: deck-diff on ${{ inputs.environment }} env
-        run: |
-          This would be a diff
-
-
-  sync:
-    environment:
-      name: ${{ inputs.environment }}
-
-    runs-on: ubuntu-latest
-    container:
-      image: kong/deck:v1.35.0
-      options: "--user root --cpus 1"
-      volumes:
-        - ./:/repository
-
-    steps:
-      - uses: actions/checkout@v2
-      
-      - name: deck-sync on ${{ inputs.environment }} env
+      - name: Deck Sync on dev
         run: |
           This would be a sync
 
-      # - name: greet
-      #   run: | 
-      #     echo "environment is ${{ github.event.inputs.environment }} / ${{ inputs.environment }}"
-      #     echo "CP NAME IS ${{ vars.KONNECT_CONTROL_PLANE_NAME }}"
+
+  sync-nonprod:
+    environment:
+      name: nonprod
+
+    needs: sync-dev
+
+    runs-on: ubuntu-latest
+    container:
+      image: kong/deck:v1.35.0
+      options: "--user root --cpus 1"
+      volumes:
+        - ./:/repository
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Deck Sync on nonprod
+        run: |
+          This would be a sync to nonprod
+
+  sync-prod:
+    environment:
+      name: prod
+
+    needs: sync-nonprod
+
+    runs-on: ubuntu-latest
+    container:
+      image: kong/deck:v1.35.0
+      options: "--user root --cpus 1"
+      volumes:
+        - ./:/repository
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Deck Sync on prod
+        run: |
+          This would be a sync to prod
