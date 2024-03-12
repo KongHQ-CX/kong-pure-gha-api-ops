@@ -4,9 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment'
-        required: true
-        default: '[nonprod],prod'
+        type: choice
+        description: Select target environment
+        options:
+        - nonprod
+        - prod
 
 jobs:
   deploy:
