@@ -11,7 +11,7 @@ on:
         - prod
 
 jobs:
-  deploy:
+  diff:
     environment:
       name: ${{ inputs.environment }}
 
@@ -24,8 +24,31 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      
+      - name: deck-diff on ${{ inputs.environment }} env
+        run: |
+          This would be a diff
 
-      - name: greet
-        run: | 
-          echo "environment is ${{ github.event.inputs.environment }} / ${{ inputs.environment }}"
-          echo "CP NAME IS ${{ vars.KONNECT_CONTROL_PLANE_NAME }}"
+
+  sync:
+    environment:
+      name: ${{ inputs.environment }}
+
+    runs-on: ubuntu-latest
+    container:
+      image: kong/deck:v1.35.0
+      options: "--user root --cpus 1"
+      volumes:
+        - ./:/repository
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: deck-sync on ${{ inputs.environment }} env
+        run: |
+          This would be a sync
+
+      # - name: greet
+      #   run: | 
+      #     echo "environment is ${{ github.event.inputs.environment }} / ${{ inputs.environment }}"
+      #     echo "CP NAME IS ${{ vars.KONNECT_CONTROL_PLANE_NAME }}"
