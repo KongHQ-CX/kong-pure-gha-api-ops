@@ -6,16 +6,20 @@ on:
       environment:
         description: 'Environment'
         required: true
-        default: 'NONPROD,PROD'
+        default: '[nonprod],prod'
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
+    container:
+      image: kong/deck:v1.35.0
+      options: "--user root --cpus 1"
+      volumes:
+        - ./:/repository
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v2
 
       - name: greet
         run: | 
           echo "environment is ${{ github.event.inputs.environment }} / ${{ inputs.environment }}"
-          echo "tag is "
