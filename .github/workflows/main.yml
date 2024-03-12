@@ -24,6 +24,8 @@ jobs:
           cd $GITHUB_WORKSPACE
 
           git fetch origin 'refs/tags/*:refs/tags/*'
+          git fetch -a
+          git reset --hard origin/main
 
           #get highest tag number
           VERSION=`git tag -l --sort -version:refname | head -n 1`
