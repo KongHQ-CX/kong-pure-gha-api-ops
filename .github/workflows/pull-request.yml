@@ -2,8 +2,6 @@ name: pull-request
 on:
   - pull_request
 
-
-
 jobs:
   lint-api-specs:
     environment:
@@ -64,10 +62,8 @@ jobs:
 
     env:
       KONNECT_API_KEY_DEV: ${{ secrets.KONNECT_API_KEY_DEV }}
-      KONNECT_API_KEY_NONPROD: ${{ secrets.KONNECT_API_KEY_NONPROD }}
-      KONNECT_API_KEY_PROD: ${{ secrets.KONNECT_API_KEY_PROD }}
-      KONNECT_CONTROL_PLANE_NAME: ${{ vars.KONNECT_CONTROL_PLANE_NAME }}
-      KONNECT_CONTROL_PLANE_REGION: ${{ vars.KONNECT_CONTROL_PLANE_REGION }}
+      KONNECT_CONTROL_PLANE_NAME_DEV: ${{ vars.KONNECT_CONTROL_PLANE_NAME_DEV }}
+      KONNECT_REGION: ${{ vars.KONNECT_REGION }}
       API_TAG: ${{ github.event.repository.name }}
 
     runs-on: ubuntu-latest
@@ -98,11 +94,11 @@ jobs:
 
       - name: Deck Diff
         run: |
-          echo "-> Diff'ing against control plane '${KONNECT_CONTROL_PLANE_NAME}' in region '${KONNECT_CONTROL_PLANE_REGION}'"
+          echo "-> Diff'ing against control plane '${KONNECT_CONTROL_PLANE_NAME_DEV}' in region '${KONNECT_REGION}'"
 
-          deck --konnect-addr="https://${KONNECT_CONTROL_PLANE_REGION}.api.konghq.com" \
+          deck --konnect-addr="https://${KONNECT_REGION}.api.konghq.com" \
                --konnect-token="${KONNECT_API_KEY_DEV}" \
-               --konnect-control-plane-name="${KONNECT_CONTROL_PLANE_NAME}" \
+               --konnect-control-plane-name="${KONNECT_CONTROL_PLANE_NAME_DEV}" \
                --select-tag="${API_TAG}" \
                gateway diff /repository/output >> out.txt
 
