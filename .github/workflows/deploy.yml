@@ -61,4 +61,4 @@ jobs:
               --konnect-token="${KONNECT_API_KEY_DEV}" \
               --konnect-control-plane-name="${KONNECT_CONTROL_PLANE_NAME_DEV}" \
               --select-tag="${API_TAG}" \
-              gateway sync /repository/output >> out.txt
+              gateway sync /repository/output
