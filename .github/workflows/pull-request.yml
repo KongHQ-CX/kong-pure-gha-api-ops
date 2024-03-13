@@ -63,7 +63,7 @@ jobs:
     env:
       KONNECT_API_KEY_DEV: ${{ secrets.KONNECT_API_KEY_DEV }}
       KONNECT_CONTROL_PLANE_NAME_DEV: ${{ vars.KONNECT_CONTROL_PLANE_NAME_DEV }}
-      KONNECT_CONTROL_PLANE_REGION: ${{ vars.KONNECT_CONTROL_PLANE_REGION }}
+      KONNECT_REGION: ${{ vars.KONNECT_REGION }}
       API_TAG: ${{ github.event.repository.name }}
 
     runs-on: ubuntu-latest
