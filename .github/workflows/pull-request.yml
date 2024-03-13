@@ -94,9 +94,9 @@ jobs:
 
       - name: Deck Diff
         run: |
-          echo "-> Diff'ing against control plane '${KONNECT_CONTROL_PLANE_NAME_DEV}' in region '${KONNECT_CONTROL_PLANE_REGION}'"
+          echo "-> Diff'ing against control plane '${KONNECT_CONTROL_PLANE_NAME_DEV}' in region '${KONNECT_REGION}'"
 
-          deck --konnect-addr="https://${KONNECT_CONTROL_PLANE_REGION}.api.konghq.com" \
+          deck --konnect-addr="https://${KONNECT_REGION}.api.konghq.com" \
                --konnect-token="${KONNECT_API_KEY_DEV}" \
                --konnect-control-plane-name="${KONNECT_CONTROL_PLANE_NAME_DEV}" \
                --select-tag="${API_TAG}" \
