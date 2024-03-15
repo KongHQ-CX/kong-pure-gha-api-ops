@@ -2,14 +2,15 @@ name: Deployment
 
 on:
   workflow_dispatch: {}
-    inputs:
-      environment:
-        type: choice
-        description: Select target environment
-        options:
-        - dev
-        - nonprod
-        - prod
+
+inputs:
+  environment:
+    type: choice
+    description: Select target environment
+    options:
+    - dev
+    - nonprod
+    - prod
 
 env:
   KONNECT_API_KEY_DEV: ${{ secrets.KONNECT_API_KEY_DEV }}
