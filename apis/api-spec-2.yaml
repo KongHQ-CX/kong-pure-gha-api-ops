@@ -1,15 +1,16 @@
 openapi: 3.0.0
 info:
-  version: v1
+  version: v2
   title: Echo Server
   description: A Simple Echo API
+
 servers:
-  - url: http://echo-server:8080/v1
+  - url: http://echo-server:8080/v2
     description: Kong Production API Gateway Interface
+
 paths:
-  /v1/echo/{user_id}:
+  /v2/echo:
     get:
-      operationId: "echo-get"
       description: Returns an echo
       responses:
         '200':
@@ -17,11 +18,25 @@ paths:
         '500':
           $ref: '#/components/responses/500Error'
     post:
-      operationId: "echo-post"
       description: Returns a POST body echo
       responses:
         '200':
           description: Successfully returns an echo
+        '500':
+          $ref: '#/components/responses/500Error'
+  /v2/print:
+    get:
+      description: Get Print Jobs
+      responses:
+        '200':
+          description: Successfully returns print jobs
+        '500':
+          $ref: '#/components/responses/500Error'
+    post:
+      description: Start a Print Job
+      responses:
+        '200':
+          description: Successfully starts a print job
         '500':
           $ref: '#/components/responses/500Error'
 components:
