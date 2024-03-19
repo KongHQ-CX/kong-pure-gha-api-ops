@@ -96,7 +96,7 @@ jobs:
         uses: mikefarah/yq@v4.41.1
         with:
           cmd: |
-            for API_SPEC_PATH in /repository/apis/*.yaml; do
+            for API_SPEC_PATH in apis/*.yaml; do
               export API_SPEC_FILENAME=$(basename $API_SPEC_PATH)
 
               if [ -f "plugins/$API_SPEC_FILENAME/service.yaml" ];
