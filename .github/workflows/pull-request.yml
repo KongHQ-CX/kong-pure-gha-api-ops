@@ -95,7 +95,9 @@ jobs:
       - name: Stream In Plugins
         uses: mikefarah/yq@v4.41.1
         with:
-          cmd: yq eval -i '.services[0].name = "replaced_by_yq"' output/api-spec-1.yaml
+          cmd: |
+            yq eval -i '.services[0].name = "replaced_by_yq"' output/api-spec-1.yaml
+            echo "DONE"
 
       - name: Deck Diff
         run: |
