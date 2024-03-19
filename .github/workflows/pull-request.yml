@@ -68,14 +68,36 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    container:
-      image: kong/deck:v1.35.0
-      options: "--user root --cpus 1"
-      volumes:
-        - ./:/repository
     steps:
       - uses: actions/checkout@v4
       - name: OpenAPI to Kong
+        container:
+          image: kong/deck:v1.35.0
+          options: "--user root --cpus 1"
+          volumes:
+            - ./:/repository
+        run: |
+          mkdir -p /repository/output/
+
+          echo "-> Generating decks from all API specs"
+
+          for API_SPEC_PATH in /repository/apis/*.yaml; do
+            export API_SPEC_FILENAME=$(basename $API_SPEC_PATH)
+
+            deck file openapi2kong \
+              -s $API_SPEC_PATH \
+              -o /repository/output/$API_SPEC_FILENAME \
+              --select-tag $API_TAG
+
+            echo "-> Genarated Kong config from ${API_SPEC_FILENAME}"
+          done
+
+      - name: Add Plugins
+        container:
+          image: kong/deck:v1.35.0
+          options: "--user root --cpus 1"
+          volumes:
+            - ./:/repository
         run: |
           mkdir -p /repository/output/
 
@@ -93,6 +115,11 @@ jobs:
           done
 
       - name: Deck Diff
+        container:
+          image: kong/deck:v1.35.0
+          options: "--user root --cpus 1"
+          volumes:
+            - ./:/repository
         run: |
           echo "-> Diff'ing against control plane '${KONNECT_CONTROL_PLANE_NAME_DEV}' in region '${KONNECT_REGION}'"
 
