@@ -97,7 +97,8 @@ jobs:
         with:
           cmd: |
             yq eval -i '.services[0].name = "replaced_by_yq"' output/api-spec-1.yaml
-            echo "DONE"
+            VAR=$(yq eval '.services[0].name' output/api-spec-1.yaml)
+            yq eval -i '.services[0].name = strenv(VAR)' output/api-spec-2.yaml
 
       - name: Deck Diff
         run: |
