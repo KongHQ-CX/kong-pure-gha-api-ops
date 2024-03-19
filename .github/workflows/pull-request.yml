@@ -97,7 +97,7 @@ jobs:
       - name: Stream In Plugins
         uses: mikefarah/yq@v4.41.1
         with:
-          cmd: yq eval '.info.title' /repository/apis/api-spec-1-copy.yaml
+          cmd: yq eval '.info.title' apis/api-spec-1-copy.yaml
 
       - name: Deck Diff
         run: |
