@@ -1,0 +1,12 @@
+service:
+- name: file-log
+  config:
+    path: /dev/stdout
+
+routes:
+  echo-get:
+  - name: pre-function
+    config:
+      access:
+      - |
+        kong.log.warn("I AM LOADED")
