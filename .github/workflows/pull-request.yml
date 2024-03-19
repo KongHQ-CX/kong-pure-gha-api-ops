@@ -92,12 +92,10 @@ jobs:
             echo "-> Genarated Kong config from ${API_SPEC_FILENAME}"
           done
 
-          cp /repository/apis/api-spec-1.yaml /repository/apis/api-spec-1-copy.yaml
-
       - name: Stream In Plugins
         uses: mikefarah/yq@v4.41.1
         with:
-          cmd: yq eval '.info.title' apis/api-spec-1-copy.yaml
+          cmd: yq eval -i '.info.title = "replaced_by_yq"' apis/api-spec-1.yaml
 
       - name: Deck Diff
         run: |
