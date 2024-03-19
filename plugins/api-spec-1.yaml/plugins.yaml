@@ -2,11 +2,16 @@ service:
 - name: file-log
   config:
     path: /dev/stdout
+- name: post-function
+  config:
+    access:
+    - |
+      kong.log.warn("I AM RUNNING PRE-FUNCTION")
 
 routes:
   echo-get:
-  - name: pre-function
+  - name: post-function
     config:
       access:
       - |
-        kong.log.warn("I AM LOADED")
+        kong.log.warn("I AM RUNNING POST-FUNCTION")
