@@ -96,12 +96,32 @@ jobs:
         uses: mikefarah/yq@v4.41.1
         with:
           cmd: |
-            yq eval -i '.services[0].name = "replaced_by_yq"' output/api-spec-1.yaml
-            VAR=$(yq eval '.services[0].name' output/api-spec-1.yaml)
-            yq eval -i '.services[0].name = strenv(VAR)' output/api-spec-2.yaml
+            for API_SPEC_PATH in /repository/apis/*.yaml; do
+              export API_SPEC_FILENAME=$(basename $API_SPEC_PATH)
+
+              if [ -f "plugins/$API_SPEC_FILENAME/service.yaml" ];
+              then
+                echo "-> We have a SERVICE plugins file for $API_SPEC_FILENAME"
+              
+                # Get the service name
+                export SERVICE_NAME=$(yq eval '.services[0].name' output/$API_SPEC_FILENAME)
+
+                echo "--> Inserting service name '$SERVICE_NAME' onto each service.yaml plugin"
+                yq eval -i '.plugins.[].service |= strenv(SERVICE_NAME)' plugins/$API_SPEC_FILENAME/service.yaml
+
+                echo "--> Moving service plugins into output ready directory"
+                mv plugins/$API_SPEC_FILENAME/service.yaml output/service-plugins.$API_SPEC_FILENAME
+
+                # yq '
+                #   .kong.plugins += load("../plugins/api-spec-1.yaml/plugins.yaml").service
+                # ' $BASENAME.yaml
+              fi
+            done
 
       - name: Deck Diff
         run: |
+          cat output/api-spec-1.yaml
+          cat output/service-plugins.api-spec-1.yaml
           echo "-> Diff'ing against control plane '${KONNECT_CONTROL_PLANE_NAME_DEV}' in region '${KONNECT_REGION}'"
 
           deck --konnect-addr="https://${KONNECT_REGION}.api.konghq.com" \
