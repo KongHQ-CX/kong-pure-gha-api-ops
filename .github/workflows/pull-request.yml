@@ -134,7 +134,7 @@ jobs:
               $PLUGINS
               EOF
 
-              mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
+              # mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
               fi
             done
 
