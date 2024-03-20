@@ -11,3 +11,17 @@ plugins:
         - |
           kong.log.warn("POST-FUNCTION")
           kong.log.warn("and another log")
+  - name: rate-limiting
+    operationId: "echoGet"
+    config:
+      limit:
+      - 10
+      window_size:
+      - 60
+  - name: pre-function
+    operationId: "echoGet"
+    config:
+      access:
+        - |
+          kong.log.warn("PRE-FUNCTION")
+          kong.log.warn("and another log route level")
