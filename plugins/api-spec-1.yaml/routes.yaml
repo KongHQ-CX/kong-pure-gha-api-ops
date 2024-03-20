@@ -14,10 +14,7 @@ plugins:
   - name: rate-limiting
     operationId: "echoGet"
     config:
-      limit:
-      - 10
-      window_size:
-      - 60
+      minute: 60
   - name: pre-function
     operationId: "echoGet"
     config:
