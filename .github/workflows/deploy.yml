@@ -215,51 +215,51 @@ jobs:
             echo "-> Genarated Kong config from ${API_SPEC_FILENAME}"
           done
 
-          - name: Stream In Plugins
-          uses: mikefarah/yq@v4.41.1
-          with:
-            cmd: |
-              for API_SPEC_PATH in apis/*.yaml; do
-                export API_SPEC_FILENAME=$(basename $API_SPEC_PATH)
-  
-                if [ -f "plugins/$API_SPEC_FILENAME/service.yaml" ];
-                then
-                  echo "-> We have a SERVICE plugins file for $API_SPEC_FILENAME"
-                
-                  # Get the service name
-                  export SERVICE_NAME=$(yq eval '.services[0].name' output/$API_SPEC_FILENAME)
-  
-                  echo "--> Inserting service name '$SERVICE_NAME' onto each service.yaml plugin"
-                  yq eval -i '.plugins.[].service |= strenv(SERVICE_NAME)' plugins/$API_SPEC_FILENAME/service.yaml
-  
-                  echo "--> Moving service plugins into output ready directory"
-                  mv plugins/$API_SPEC_FILENAME/service.yaml output/service-plugins.$API_SPEC_FILENAME
-                fi
-  
-                if [ -f "plugins/$API_SPEC_FILENAME/routes.yaml" ];
-                then
-                  echo "-> We have a ROUTES plugins file for $API_SPEC_FILENAME"
-  
-                  PLUGINS=$(yq e -o=j -I=0 '.plugins[]' plugins/$API_SPEC_FILENAME/routes.yaml)
-  
-                  export i=0
-  
-                  while IFS=\= read -r PLUGIN; do
-                    export OPERATION_ID_REF=$(echo "$PLUGIN" | yq e '.operationId | sub("(-|\.|_| )", "-") | downcase' -)
-                    export ROUTE_NAME="${SERVICE_NAME}_${OPERATION_ID_REF}"
-                    
-                    echo "--> Parsed route name as ${ROUTE_NAME} - attaching back to plugin"
-  
-                    yq eval -i '.plugins[env(i)].route = strenv(ROUTE_NAME)' plugins/$API_SPEC_FILENAME/routes.yaml
-                    yq eval -i 'del(.plugins[env(i)].operationId)' plugins/$API_SPEC_FILENAME/routes.yaml
-                    export i=$((i+1))
-                  done <<EOF
-              $PLUGINS
-              EOF
-  
-                mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
-                fi
-              done
+      - name: Stream In Plugins
+        uses: mikefarah/yq@v4.41.1
+        with:
+          cmd: |
+            for API_SPEC_PATH in apis/*.yaml; do
+              export API_SPEC_FILENAME=$(basename $API_SPEC_PATH)
+
+              if [ -f "plugins/$API_SPEC_FILENAME/service.yaml" ];
+              then
+                echo "-> We have a SERVICE plugins file for $API_SPEC_FILENAME"
+              
+                # Get the service name
+                export SERVICE_NAME=$(yq eval '.services[0].name' output/$API_SPEC_FILENAME)
+
+                echo "--> Inserting service name '$SERVICE_NAME' onto each service.yaml plugin"
+                yq eval -i '.plugins.[].service |= strenv(SERVICE_NAME)' plugins/$API_SPEC_FILENAME/service.yaml
+
+                echo "--> Moving service plugins into output ready directory"
+                mv plugins/$API_SPEC_FILENAME/service.yaml output/service-plugins.$API_SPEC_FILENAME
+              fi
+
+              if [ -f "plugins/$API_SPEC_FILENAME/routes.yaml" ];
+              then
+                echo "-> We have a ROUTES plugins file for $API_SPEC_FILENAME"
+
+                PLUGINS=$(yq e -o=j -I=0 '.plugins[]' plugins/$API_SPEC_FILENAME/routes.yaml)
+
+                export i=0
+
+                while IFS=\= read -r PLUGIN; do
+                  export OPERATION_ID_REF=$(echo "$PLUGIN" | yq e '.operationId | sub("(-|\.|_| )", "-") | downcase' -)
+                  export ROUTE_NAME="${SERVICE_NAME}_${OPERATION_ID_REF}"
+                  
+                  echo "--> Parsed route name as ${ROUTE_NAME} - attaching back to plugin"
+
+                  yq eval -i '.plugins[env(i)].route = strenv(ROUTE_NAME)' plugins/$API_SPEC_FILENAME/routes.yaml
+                  yq eval -i 'del(.plugins[env(i)].operationId)' plugins/$API_SPEC_FILENAME/routes.yaml
+                  export i=$((i+1))
+                done <<EOF
+            $PLUGINS
+            EOF
+
+              mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
+              fi
+            done
   
       - name: Deck Sync on staging
         run: |
