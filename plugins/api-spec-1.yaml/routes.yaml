@@ -1,28 +1,7 @@
 _format_version: "3.0"
+
 plugins:
-  - name: http-log
-    operationId: "echoGet"
-    config:
-      http_endpoint: "http://jackgpt.co.uk/nowhere"
-  - name: post-function
-    operationId: "echoPost"
-    config:
-      access:
-        - |
-          kong.log.warn("POST-FUNCTION")
-          kong.log.warn("and another log")
-  - name: rate-limiting
-    operationId: "echoPost"
-    config:
-      minute: 60
-  - name: rate-limiting
-    operationId: "echoGet"
-    config:
-      minute: 60
-  - name: pre-function
-    operationId: "echoGet"
-    config:
-      access:
-        - |
-          kong.log.warn("PRE-FUNCTION")
-          kong.log.warn("and another log route level")
+- name: rate-limiting
+  operationId: "echoPost"
+  config:
+    minute: 60
