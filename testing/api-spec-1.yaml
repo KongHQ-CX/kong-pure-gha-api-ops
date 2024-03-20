@@ -1,0 +1,32 @@
+_format_version: "3.0"
+services:
+- host: echo-server
+  id: 037c8e81-96e3-5097-b0b9-74e38b7989a9
+  name: echo-server-with-dashes-with-underscores-with-dots
+  path: /v1
+  plugins: []
+  port: 8080
+  protocol: http
+  routes:
+  - id: 13a4b2c6-2a04-5ff4-804e-58d797d25d20
+    methods:
+    - GET
+    name: echo-server-with-dashes-with-underscores-with-dots_echoget
+    paths:
+    - ~/v1/echo/(?<user_id>[^#?/]+)$
+    plugins: []
+    regex_priority: 100
+    strip_path: false
+    tags: []
+  - id: d6e4a423-161d-5682-bec7-163df6118f4a
+    methods:
+    - POST
+    name: echo-server-with-dashes-with-underscores-with-dots_echopost
+    paths:
+    - ~/v1/echo/(?<user_id>[^#?/]+)$
+    plugins: []
+    regex_priority: 100
+    strip_path: false
+    tags: []
+  tags: []
+upstreams: []
