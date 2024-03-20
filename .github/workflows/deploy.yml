@@ -66,6 +66,9 @@ jobs:
                 echo "--> Inserting service name '$SERVICE_NAME' onto each service.yaml plugin"
                 yq eval -i '.plugins.[].service |= strenv(SERVICE_NAME)' plugins/$API_SPEC_FILENAME/service.yaml
 
+                echo "--> Adding API tag to all plugins"
+                yq eval '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
+
                 echo "--> Moving service plugins into output ready directory"
                 mv plugins/$API_SPEC_FILENAME/service.yaml output/service-plugins.$API_SPEC_FILENAME
               fi
@@ -91,7 +94,10 @@ jobs:
             $PLUGINS
             EOF
 
-              mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
+                echo "--> Adding API tag to all plugins"
+                yq eval '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
+
+                mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
               fi
             done
 
@@ -147,6 +153,9 @@ jobs:
                 echo "--> Inserting service name '$SERVICE_NAME' onto each service.yaml plugin"
                 yq eval -i '.plugins.[].service |= strenv(SERVICE_NAME)' plugins/$API_SPEC_FILENAME/service.yaml
 
+                echo "--> Adding API tag to all plugins"
+                yq eval '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
+
                 echo "--> Moving service plugins into output ready directory"
                 mv plugins/$API_SPEC_FILENAME/service.yaml output/service-plugins.$API_SPEC_FILENAME
               fi
@@ -172,7 +181,10 @@ jobs:
             $PLUGINS
             EOF
 
-              mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
+                echo "--> Adding API tag to all plugins"
+                yq eval '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
+
+                mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
               fi
             done
 
@@ -232,6 +244,9 @@ jobs:
                 echo "--> Inserting service name '$SERVICE_NAME' onto each service.yaml plugin"
                 yq eval -i '.plugins.[].service |= strenv(SERVICE_NAME)' plugins/$API_SPEC_FILENAME/service.yaml
 
+                echo "--> Adding API tag to all plugins"
+                yq eval '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
+
                 echo "--> Moving service plugins into output ready directory"
                 mv plugins/$API_SPEC_FILENAME/service.yaml output/service-plugins.$API_SPEC_FILENAME
               fi
@@ -257,7 +272,10 @@ jobs:
             $PLUGINS
             EOF
 
-              mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
+                echo "--> Adding API tag to all plugins"
+                yq eval '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
+
+                mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
               fi
             done
   
@@ -313,6 +331,9 @@ jobs:
                 echo "--> Inserting service name '$SERVICE_NAME' onto each service.yaml plugin"
                 yq eval -i '.plugins.[].service |= strenv(SERVICE_NAME)' plugins/$API_SPEC_FILENAME/service.yaml
 
+                echo "--> Adding API tag to all plugins"
+                yq eval '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
+
                 echo "--> Moving service plugins into output ready directory"
                 mv plugins/$API_SPEC_FILENAME/service.yaml output/service-plugins.$API_SPEC_FILENAME
               fi
@@ -338,7 +359,10 @@ jobs:
             $PLUGINS
             EOF
 
-              mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
+                echo "--> Adding API tag to all plugins"
+                yq eval '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
+
+                mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
               fi
             done
 
@@ -397,6 +421,9 @@ jobs:
                 echo "--> Inserting service name '$SERVICE_NAME' onto each service.yaml plugin"
                 yq eval -i '.plugins.[].service |= strenv(SERVICE_NAME)' plugins/$API_SPEC_FILENAME/service.yaml
 
+                echo "--> Adding API tag to all plugins"
+                yq eval '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
+
                 echo "--> Moving service plugins into output ready directory"
                 mv plugins/$API_SPEC_FILENAME/service.yaml output/service-plugins.$API_SPEC_FILENAME
               fi
@@ -422,7 +449,10 @@ jobs:
             $PLUGINS
             EOF
 
-              mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
+                echo "--> Adding API tag to all plugins"
+                yq eval '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
+
+                mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
               fi
             done
 
