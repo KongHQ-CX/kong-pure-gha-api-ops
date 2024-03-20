@@ -131,8 +131,8 @@ jobs:
                   yq eval -i 'del(.plugins[env(i)].operationId)' plugins/$API_SPEC_FILENAME/routes.yaml
                   export i=$((i+1))
                 done <<EOF
-              $PLUGINS
-              EOF
+            $PLUGINS
+            EOF
 
               mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
               fi
