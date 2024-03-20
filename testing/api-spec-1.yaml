@@ -8,20 +8,20 @@ services:
   port: 8080
   protocol: http
   routes:
-  - id: d607003c-1483-5e86-aa39-f748c3abb6de
+  - id: 13a4b2c6-2a04-5ff4-804e-58d797d25d20
     methods:
     - GET
-    name: echo-server-with-dashes-with-underscores-with-dots_echo-get
+    name: echo-server-with-dashes-with-underscores-with-dots_echoget
     paths:
     - ~/v1/echo/(?<user_id>[^#?/]+)$
     plugins: []
     regex_priority: 100
     strip_path: false
     tags: []
-  - id: 19db5d87-1771-518e-81dc-7fe97cec4725
+  - id: d6e4a423-161d-5682-bec7-163df6118f4a
     methods:
     - POST
-    name: echo-server-with-dashes-with-underscores-with-dots_echo-post
+    name: echo-server-with-dashes-with-underscores-with-dots_echopost
     paths:
     - ~/v1/echo/(?<user_id>[^#?/]+)$
     plugins: []
