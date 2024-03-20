@@ -1,0 +1,13 @@
+_format_version: "3.0"
+plugins:
+  - name: http-log
+    operationId: "echoGet"
+    config:
+      http_endpoint: "http://jackgpt.co.uk/nowhere"
+  - name: post-function
+    operationId: "echoPost"
+    config:
+      access:
+        - |
+          kong.log.warn("POST-FUNCTION")
+          kong.log.warn("and another log")

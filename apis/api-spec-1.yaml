@@ -9,7 +9,7 @@ servers:
 paths:
   /v1/echo/{user_id}:
     get:
-      operationId: "echo-get"
+      operationId: "echoGet"
       description: Returns an echo
       responses:
         '200':
@@ -17,7 +17,7 @@ paths:
         '500':
           $ref: '#/components/responses/500Error'
     post:
-      operationId: "echo-post"
+      operationId: "echoPost"
       description: Returns a POST body echo
       responses:
         '200':

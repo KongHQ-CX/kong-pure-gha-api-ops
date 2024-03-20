@@ -3,10 +3,10 @@ plugins:
   - name: file-log
     config:
       path: "/dev/stdout"
-    service: echo-server-with-dashes-with-underscores-with-dots
+    service: "echo-server-with-dashes-with-underscores-with-dots"
   - name: pre-function
     config:
       access:
         - |
           kong.log.warn("PRE-FUNCTION")
-    service: echo-server-with-dashes-with-underscores-with-dots
+    service: "echo-server-with-dashes-with-underscores-with-dots"
