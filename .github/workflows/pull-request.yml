@@ -140,7 +140,6 @@ jobs:
 
       - name: Deck Diff
         run: |
-          ls -la /repository/output/
           echo "-> Diff'ing against control plane '${KONNECT_CONTROL_PLANE_NAME_DEV}' in region '${KONNECT_REGION}'"
 
           deck --konnect-addr="https://${KONNECT_REGION}.api.konghq.com" \
