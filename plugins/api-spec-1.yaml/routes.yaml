@@ -1,0 +1,7 @@
+_format_version: "3.0"
+
+plugins:
+- name: rate-limiting
+  operationId: "echoPost"
+  config:
+    minute: 60
