@@ -12,6 +12,10 @@ plugins:
           kong.log.warn("POST-FUNCTION")
           kong.log.warn("and another log")
   - name: rate-limiting
+    operationId: "echoPost"
+    config:
+      minute: 60
+  - name: rate-limiting
     operationId: "echoGet"
     config:
       minute: 60
