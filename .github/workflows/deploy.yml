@@ -66,8 +66,8 @@ jobs:
                 echo "--> Inserting service name '$SERVICE_NAME' onto each service.yaml plugin"
                 yq eval -i '.plugins.[].service |= strenv(SERVICE_NAME)' plugins/$API_SPEC_FILENAME/service.yaml
 
-                echo "--> Adding API tag to all plugins"
-                yq eval '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
+                echo "--> Adding API tag to all service plugins"
+                yq eval -i '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
 
                 echo "--> Moving service plugins into output ready directory"
                 mv plugins/$API_SPEC_FILENAME/service.yaml output/service-plugins.$API_SPEC_FILENAME
@@ -82,22 +82,43 @@ jobs:
                 export i=0
 
                 while IFS=\= read -r PLUGIN; do
+                export X_KONG_NAME=$(echo "$PLUGIN" | yq e '.x-kong-name' -)
+          
+                if [ ! "$X_KONG_NAME" == "null" ];
+                then
+                  # look for the operation in the spec, and parse the route name from it
+                  echo "---> Finding OAS operation by x-kong-name '${X_KONG_NAME}'"
+                  export ROUTE_PATH=$(yq e '.paths | with_entries(select(.*.*.x-kong-name == env(X_KONG_NAME))) | keys | .[0] | sub("(-|\.|_|/|{|}| )", "-") | sub("(--)", "-") | downcase' $API_SPEC_PATH)
+                  export ROUTE_PATH="${ROUTE_PATH:1}"
+                  export ROUTE_PATH="${ROUTE_PATH::-1}"
+                  export X_KONG_NAME_REPLACED=$(echo "$PLUGIN" | yq e '.x-kong-name | sub("(-|\.|_| )", "-") | downcase' -)
+
+                  export ROUTE_NAME="${SERVICE_NAME}_${ROUTE_PATH}_${X_KONG_NAME_REPLACED}"
+                            
+                  echo "--> Parsed route name as ${ROUTE_NAME} - attaching back to plugin"
+          
+                  yq eval -i '.plugins[env(i)].route = strenv(ROUTE_NAME)' plugins/$API_SPEC_FILENAME/routes.yaml
+                  yq eval -i 'del(.plugins[env(i)].x-kong-name)' plugins/$API_SPEC_FILENAME/routes.yaml
+                  export i=$((i+1))
+                else
+                  # old-fashioned way
                   export OPERATION_ID_REF=$(echo "$PLUGIN" | yq e '.operationId | sub("(-|\.|_| )", "-") | downcase' -)
                   export ROUTE_NAME="${SERVICE_NAME}_${OPERATION_ID_REF}"
-                  
+          
                   echo "--> Parsed route name as ${ROUTE_NAME} - attaching back to plugin"
-
+          
                   yq eval -i '.plugins[env(i)].route = strenv(ROUTE_NAME)' plugins/$API_SPEC_FILENAME/routes.yaml
                   yq eval -i 'del(.plugins[env(i)].operationId)' plugins/$API_SPEC_FILENAME/routes.yaml
                   export i=$((i+1))
-                done <<EOF
+                fi
+              done <<EOF
             $PLUGINS
             EOF
 
-                echo "--> Adding API tag to all plugins"
-                yq eval '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
+              echo "--> Adding API tag to all route plugins"
+              yq eval -i '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/routes.yaml
 
-                mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
+              mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
               fi
             done
 
@@ -153,8 +174,8 @@ jobs:
                 echo "--> Inserting service name '$SERVICE_NAME' onto each service.yaml plugin"
                 yq eval -i '.plugins.[].service |= strenv(SERVICE_NAME)' plugins/$API_SPEC_FILENAME/service.yaml
 
-                echo "--> Adding API tag to all plugins"
-                yq eval '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
+                echo "--> Adding API tag to all service plugins"
+                yq eval -i '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
 
                 echo "--> Moving service plugins into output ready directory"
                 mv plugins/$API_SPEC_FILENAME/service.yaml output/service-plugins.$API_SPEC_FILENAME
@@ -169,22 +190,43 @@ jobs:
                 export i=0
 
                 while IFS=\= read -r PLUGIN; do
+                export X_KONG_NAME=$(echo "$PLUGIN" | yq e '.x-kong-name' -)
+          
+                if [ ! "$X_KONG_NAME" == "null" ];
+                then
+                  # look for the operation in the spec, and parse the route name from it
+                  echo "---> Finding OAS operation by x-kong-name '${X_KONG_NAME}'"
+                  export ROUTE_PATH=$(yq e '.paths | with_entries(select(.*.*.x-kong-name == env(X_KONG_NAME))) | keys | .[0] | sub("(-|\.|_|/|{|}| )", "-") | sub("(--)", "-") | downcase' $API_SPEC_PATH)
+                  export ROUTE_PATH="${ROUTE_PATH:1}"
+                  export ROUTE_PATH="${ROUTE_PATH::-1}"
+                  export X_KONG_NAME_REPLACED=$(echo "$PLUGIN" | yq e '.x-kong-name | sub("(-|\.|_| )", "-") | downcase' -)
+
+                  export ROUTE_NAME="${SERVICE_NAME}_${ROUTE_PATH}_${X_KONG_NAME_REPLACED}"
+                            
+                  echo "--> Parsed route name as ${ROUTE_NAME} - attaching back to plugin"
+          
+                  yq eval -i '.plugins[env(i)].route = strenv(ROUTE_NAME)' plugins/$API_SPEC_FILENAME/routes.yaml
+                  yq eval -i 'del(.plugins[env(i)].x-kong-name)' plugins/$API_SPEC_FILENAME/routes.yaml
+                  export i=$((i+1))
+                else
+                  # old-fashioned way
                   export OPERATION_ID_REF=$(echo "$PLUGIN" | yq e '.operationId | sub("(-|\.|_| )", "-") | downcase' -)
                   export ROUTE_NAME="${SERVICE_NAME}_${OPERATION_ID_REF}"
-                  
+          
                   echo "--> Parsed route name as ${ROUTE_NAME} - attaching back to plugin"
-
+          
                   yq eval -i '.plugins[env(i)].route = strenv(ROUTE_NAME)' plugins/$API_SPEC_FILENAME/routes.yaml
                   yq eval -i 'del(.plugins[env(i)].operationId)' plugins/$API_SPEC_FILENAME/routes.yaml
                   export i=$((i+1))
-                done <<EOF
+                fi
+              done <<EOF
             $PLUGINS
             EOF
 
-                echo "--> Adding API tag to all plugins"
-                yq eval '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
+              echo "--> Adding API tag to all route plugins"
+              yq eval -i '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/routes.yaml
 
-                mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
+              mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
               fi
             done
 
@@ -244,8 +286,8 @@ jobs:
                 echo "--> Inserting service name '$SERVICE_NAME' onto each service.yaml plugin"
                 yq eval -i '.plugins.[].service |= strenv(SERVICE_NAME)' plugins/$API_SPEC_FILENAME/service.yaml
 
-                echo "--> Adding API tag to all plugins"
-                yq eval '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
+                echo "--> Adding API tag to all service plugins"
+                yq eval -i '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
 
                 echo "--> Moving service plugins into output ready directory"
                 mv plugins/$API_SPEC_FILENAME/service.yaml output/service-plugins.$API_SPEC_FILENAME
@@ -260,22 +302,43 @@ jobs:
                 export i=0
 
                 while IFS=\= read -r PLUGIN; do
+                export X_KONG_NAME=$(echo "$PLUGIN" | yq e '.x-kong-name' -)
+          
+                if [ ! "$X_KONG_NAME" == "null" ];
+                then
+                  # look for the operation in the spec, and parse the route name from it
+                  echo "---> Finding OAS operation by x-kong-name '${X_KONG_NAME}'"
+                  export ROUTE_PATH=$(yq e '.paths | with_entries(select(.*.*.x-kong-name == env(X_KONG_NAME))) | keys | .[0] | sub("(-|\.|_|/|{|}| )", "-") | sub("(--)", "-") | downcase' $API_SPEC_PATH)
+                  export ROUTE_PATH="${ROUTE_PATH:1}"
+                  export ROUTE_PATH="${ROUTE_PATH::-1}"
+                  export X_KONG_NAME_REPLACED=$(echo "$PLUGIN" | yq e '.x-kong-name | sub("(-|\.|_| )", "-") | downcase' -)
+
+                  export ROUTE_NAME="${SERVICE_NAME}_${ROUTE_PATH}_${X_KONG_NAME_REPLACED}"
+                            
+                  echo "--> Parsed route name as ${ROUTE_NAME} - attaching back to plugin"
+          
+                  yq eval -i '.plugins[env(i)].route = strenv(ROUTE_NAME)' plugins/$API_SPEC_FILENAME/routes.yaml
+                  yq eval -i 'del(.plugins[env(i)].x-kong-name)' plugins/$API_SPEC_FILENAME/routes.yaml
+                  export i=$((i+1))
+                else
+                  # old-fashioned way
                   export OPERATION_ID_REF=$(echo "$PLUGIN" | yq e '.operationId | sub("(-|\.|_| )", "-") | downcase' -)
                   export ROUTE_NAME="${SERVICE_NAME}_${OPERATION_ID_REF}"
-                  
+          
                   echo "--> Parsed route name as ${ROUTE_NAME} - attaching back to plugin"
-
+          
                   yq eval -i '.plugins[env(i)].route = strenv(ROUTE_NAME)' plugins/$API_SPEC_FILENAME/routes.yaml
                   yq eval -i 'del(.plugins[env(i)].operationId)' plugins/$API_SPEC_FILENAME/routes.yaml
                   export i=$((i+1))
-                done <<EOF
+                fi
+              done <<EOF
             $PLUGINS
             EOF
 
-                echo "--> Adding API tag to all plugins"
-                yq eval '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
+              echo "--> Adding API tag to all route plugins"
+              yq eval -i '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/routes.yaml
 
-                mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
+              mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
               fi
             done
   
@@ -331,8 +394,8 @@ jobs:
                 echo "--> Inserting service name '$SERVICE_NAME' onto each service.yaml plugin"
                 yq eval -i '.plugins.[].service |= strenv(SERVICE_NAME)' plugins/$API_SPEC_FILENAME/service.yaml
 
-                echo "--> Adding API tag to all plugins"
-                yq eval '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
+                echo "--> Adding API tag to all service plugins"
+                yq eval -i '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
 
                 echo "--> Moving service plugins into output ready directory"
                 mv plugins/$API_SPEC_FILENAME/service.yaml output/service-plugins.$API_SPEC_FILENAME
@@ -347,22 +410,43 @@ jobs:
                 export i=0
 
                 while IFS=\= read -r PLUGIN; do
+                export X_KONG_NAME=$(echo "$PLUGIN" | yq e '.x-kong-name' -)
+          
+                if [ ! "$X_KONG_NAME" == "null" ];
+                then
+                  # look for the operation in the spec, and parse the route name from it
+                  echo "---> Finding OAS operation by x-kong-name '${X_KONG_NAME}'"
+                  export ROUTE_PATH=$(yq e '.paths | with_entries(select(.*.*.x-kong-name == env(X_KONG_NAME))) | keys | .[0] | sub("(-|\.|_|/|{|}| )", "-") | sub("(--)", "-") | downcase' $API_SPEC_PATH)
+                  export ROUTE_PATH="${ROUTE_PATH:1}"
+                  export ROUTE_PATH="${ROUTE_PATH::-1}"
+                  export X_KONG_NAME_REPLACED=$(echo "$PLUGIN" | yq e '.x-kong-name | sub("(-|\.|_| )", "-") | downcase' -)
+
+                  export ROUTE_NAME="${SERVICE_NAME}_${ROUTE_PATH}_${X_KONG_NAME_REPLACED}"
+                            
+                  echo "--> Parsed route name as ${ROUTE_NAME} - attaching back to plugin"
+          
+                  yq eval -i '.plugins[env(i)].route = strenv(ROUTE_NAME)' plugins/$API_SPEC_FILENAME/routes.yaml
+                  yq eval -i 'del(.plugins[env(i)].x-kong-name)' plugins/$API_SPEC_FILENAME/routes.yaml
+                  export i=$((i+1))
+                else
+                  # old-fashioned way
                   export OPERATION_ID_REF=$(echo "$PLUGIN" | yq e '.operationId | sub("(-|\.|_| )", "-") | downcase' -)
                   export ROUTE_NAME="${SERVICE_NAME}_${OPERATION_ID_REF}"
-                  
+          
                   echo "--> Parsed route name as ${ROUTE_NAME} - attaching back to plugin"
-
+          
                   yq eval -i '.plugins[env(i)].route = strenv(ROUTE_NAME)' plugins/$API_SPEC_FILENAME/routes.yaml
                   yq eval -i 'del(.plugins[env(i)].operationId)' plugins/$API_SPEC_FILENAME/routes.yaml
                   export i=$((i+1))
-                done <<EOF
+                fi
+              done <<EOF
             $PLUGINS
             EOF
 
-                echo "--> Adding API tag to all plugins"
-                yq eval '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
+              echo "--> Adding API tag to all route plugins"
+              yq eval -i '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/routes.yaml
 
-                mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
+              mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
               fi
             done
 
@@ -421,8 +505,8 @@ jobs:
                 echo "--> Inserting service name '$SERVICE_NAME' onto each service.yaml plugin"
                 yq eval -i '.plugins.[].service |= strenv(SERVICE_NAME)' plugins/$API_SPEC_FILENAME/service.yaml
 
-                echo "--> Adding API tag to all plugins"
-                yq eval '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
+                echo "--> Adding API tag to all service plugins"
+                yq eval -i '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
 
                 echo "--> Moving service plugins into output ready directory"
                 mv plugins/$API_SPEC_FILENAME/service.yaml output/service-plugins.$API_SPEC_FILENAME
@@ -437,22 +521,43 @@ jobs:
                 export i=0
 
                 while IFS=\= read -r PLUGIN; do
+                export X_KONG_NAME=$(echo "$PLUGIN" | yq e '.x-kong-name' -)
+          
+                if [ ! "$X_KONG_NAME" == "null" ];
+                then
+                  # look for the operation in the spec, and parse the route name from it
+                  echo "---> Finding OAS operation by x-kong-name '${X_KONG_NAME}'"
+                  export ROUTE_PATH=$(yq e '.paths | with_entries(select(.*.*.x-kong-name == env(X_KONG_NAME))) | keys | .[0] | sub("(-|\.|_|/|{|}| )", "-") | sub("(--)", "-") | downcase' $API_SPEC_PATH)
+                  export ROUTE_PATH="${ROUTE_PATH:1}"
+                  export ROUTE_PATH="${ROUTE_PATH::-1}"
+                  export X_KONG_NAME_REPLACED=$(echo "$PLUGIN" | yq e '.x-kong-name | sub("(-|\.|_| )", "-") | downcase' -)
+
+                  export ROUTE_NAME="${SERVICE_NAME}_${ROUTE_PATH}_${X_KONG_NAME_REPLACED}"
+                            
+                  echo "--> Parsed route name as ${ROUTE_NAME} - attaching back to plugin"
+          
+                  yq eval -i '.plugins[env(i)].route = strenv(ROUTE_NAME)' plugins/$API_SPEC_FILENAME/routes.yaml
+                  yq eval -i 'del(.plugins[env(i)].x-kong-name)' plugins/$API_SPEC_FILENAME/routes.yaml
+                  export i=$((i+1))
+                else
+                  # old-fashioned way
                   export OPERATION_ID_REF=$(echo "$PLUGIN" | yq e '.operationId | sub("(-|\.|_| )", "-") | downcase' -)
                   export ROUTE_NAME="${SERVICE_NAME}_${OPERATION_ID_REF}"
-                  
+          
                   echo "--> Parsed route name as ${ROUTE_NAME} - attaching back to plugin"
-
+          
                   yq eval -i '.plugins[env(i)].route = strenv(ROUTE_NAME)' plugins/$API_SPEC_FILENAME/routes.yaml
                   yq eval -i 'del(.plugins[env(i)].operationId)' plugins/$API_SPEC_FILENAME/routes.yaml
                   export i=$((i+1))
-                done <<EOF
+                fi
+              done <<EOF
             $PLUGINS
             EOF
 
-                echo "--> Adding API tag to all plugins"
-                yq eval '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
+              echo "--> Adding API tag to all route plugins"
+              yq eval -i '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/routes.yaml
 
-                mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
+              mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
               fi
             done
 
