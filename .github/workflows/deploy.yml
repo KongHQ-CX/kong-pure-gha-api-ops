@@ -411,6 +411,23 @@ jobs:
             for API_SPEC_PATH in apis/*.yaml; do
               export API_SPEC_FILENAME=$(basename $API_SPEC_PATH)
 
+              if [ -f "plugins/$API_SPEC_FILENAME/service.yaml" ];
+              then
+                echo "-> We have a SERVICE plugins file for $API_SPEC_FILENAME"
+              
+                # Get the service name
+                export SERVICE_NAME=$(yq eval '.services[0].name' output/$API_SPEC_FILENAME)
+
+                echo "--> Inserting service name '$SERVICE_NAME' onto each service.yaml plugin"
+                yq eval -i '.plugins.[].service |= strenv(SERVICE_NAME)' plugins/$API_SPEC_FILENAME/service.yaml
+
+                echo "--> Adding API tag to all plugins"
+                yq eval '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
+
+                echo "--> Moving service plugins into output ready directory"
+                mv plugins/$API_SPEC_FILENAME/service.yaml plugins/$API_SPEC_FILENAME/service.yaml
+              fi
+
               if [ -f "plugins/$API_SPEC_FILENAME/routes.yaml" ];
               then
                 echo "-> We have a ROUTES plugins file for $API_SPEC_FILENAME"
