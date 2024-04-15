@@ -152,6 +152,7 @@ jobs:
           
                   yq eval -i '.plugins[env(i)].route = strenv(ROUTE_NAME)' plugins/$API_SPEC_FILENAME/routes.yaml
                   yq eval -i 'del(.plugins[env(i)].operationId)' plugins/$API_SPEC_FILENAME/routes.yaml
+                  yq eval -i 'del(.plugins[env(i)].x-kong-name)' plugins/$API_SPEC_FILENAME/routes.yaml
                   export i=$((i+1))
                 fi
               done <<EOF
@@ -159,7 +160,7 @@ jobs:
             EOF
 
               echo "--> Adding API tag to all plugins"
-              yq eval '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/routes.yaml
+              yq eval -i '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/routes.yaml
 
               mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
               fi
