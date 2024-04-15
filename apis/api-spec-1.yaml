@@ -7,6 +7,16 @@ servers:
   - url: http://echo-server:8080/v1
     description: Kong Production API Gateway Interface
 paths:
+  /v1/echo:
+    get:
+      x-kong-name: "jack-echo_GET_ALL"
+      operationId: "echoGetAll"
+      description: Returns an echo
+      responses:
+        '200':
+          description: Successfully returns an echo
+        '500':
+          $ref: '#/components/responses/500Error'
   /v1/echo/{user_id}:
     get:
       x-kong-name: "jack-echo_GET"
