@@ -9,6 +9,7 @@ servers:
 paths:
   /v1/echo/{user_id}:
     get:
+      x-kong-name: "jack-echo_GET"
       operationId: "echoGet"
       description: Returns an echo
       responses:
