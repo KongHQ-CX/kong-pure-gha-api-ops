@@ -5,3 +5,9 @@ plugins:
   operationId: "echoPost"
   config:
     minute: 60
+- name: pre-function
+  operationId: "echoGet"
+  config:
+    access:
+    - |
+      kong.log.warn("per-route pre-function")
