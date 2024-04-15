@@ -113,7 +113,7 @@ jobs:
                 yq eval -i '.plugins[].tags = [env(API_TAG)]' plugins/$API_SPEC_FILENAME/service.yaml
 
                 echo "--> Moving service plugins into output ready directory"
-                mv plugins/$API_SPEC_FILENAME/service.yaml plugins/$API_SPEC_FILENAME/service.yaml
+                mv plugins/$API_SPEC_FILENAME/service.yaml output/service-plugins.$API_SPEC_FILENAME
               fi
 
               if [ -f "plugins/$API_SPEC_FILENAME/routes.yaml" ];
