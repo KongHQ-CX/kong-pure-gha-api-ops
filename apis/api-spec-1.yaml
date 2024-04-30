@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   version: v1
-  title: Echo Server with-dashes with_underscores with.dots
+  title: Echo Server with-dashes with_underscores with.dots.
   description: A Simple Echo API
 servers:
   - url: http://echo-server:8080/v1
