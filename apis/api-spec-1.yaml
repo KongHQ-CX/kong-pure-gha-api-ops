@@ -21,6 +21,13 @@ paths:
     get:
       x-kong-name: "jack-echo_GET"
       operationId: "echoGet"
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: string
+
       description: Returns an echo
       responses:
         '200':
@@ -29,6 +36,12 @@ paths:
           $ref: '#/components/responses/500Error'
     post:
       operationId: "echoPost"
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: string
       description: Returns a POST body echo
       responses:
         '200':
@@ -46,4 +59,3 @@ components:
             properties:
               message:
                 type: string
-
