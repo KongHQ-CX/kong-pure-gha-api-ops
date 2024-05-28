@@ -171,7 +171,7 @@ jobs:
           deck --kong-addr="${KONG_ADMIN_URL}" \
               --headers="kong-admin-token:${KONG_ADMIN_TOKEN}" \
               --select-tag="${API_TAG}" \
-              --workspace="${DEV_WORKSPACE} \
+              --workspace="${DEV_WORKSPACE}" \
               gateway sync /repository/output >> out.txt
 
           echo "-> Producing pull request comment"
