@@ -57,6 +57,7 @@ jobs:
             })
 
   diff-control-plane:
+    permissions: write-all
     environment:
       name: "dev"
 
