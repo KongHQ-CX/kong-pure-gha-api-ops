@@ -11,14 +11,12 @@ on:
     #     - prod
 
 env:
-  KONNECT_API_KEY_DEV: ${{ secrets.KONNECT_API_KEY_DEV }}
-  KONNECT_CONTROL_PLANE_NAME_DEV: ${{ vars.KONNECT_CONTROL_PLANE_NAME_DEV }}
-  KONNECT_API_KEY_STAGING: ${{ secrets.KONNECT_API_KEY_STAGING }}
-  KONNECT_CONTROL_PLANE_NAME_STAGING: ${{ vars.KONNECT_CONTROL_PLANE_NAME_STAGING }}
-  KONNECT_API_KEY_PROD: ${{ secrets.KONNECT_API_KEY_PROD }}
-  KONNECT_CONTROL_PLANE_NAME_PROD: ${{ vars.KONNECT_CONTROL_PLANE_NAME_PROD }}
-  KONNECT_REGION: ${{ vars.KONNECT_REGION }}
+  KONG_ADMIN_URL: ${{ secrets.KONG_ADMIN_URL }}
+  KONG_ADMIN_TOKEN: ${{ vars.KONG_ADMIN_TOKEN }}
   API_TAG: ${{ github.event.repository.name }}
+  DEV_WORKSPACE: ${{ vars.DEV_WORKSPACE }}
+  STAGING_WORKSPACE: ${{ vars.STAGING_WORKSPACE }}
+  PROD_WORKSPACE: ${{ vars.PROD_WORKSPACE }}
 
 jobs:
   # Commit the sync straight to dev
@@ -124,11 +122,10 @@ jobs:
 
       - name: Deck Sync on dev
         run: |
-          echo "-> Sync'ing against control plane '${KONNECT_CONTROL_PLANE_NAME_DEV}' in region '${KONNECT_REGION}'"
-          deck --konnect-addr="https://${KONNECT_REGION}.api.konghq.com" \
-              --konnect-token="${KONNECT_API_KEY_DEV}" \
-              --konnect-control-plane-name="${KONNECT_CONTROL_PLANE_NAME_DEV}" \
+          deck --kong-addr="${KONG_ADMIN_URL" \
+              --headers="kong-admin-token:${KONG_ADMIN_TOKEN}" \
               --select-tag="${API_TAG}" \
+              --workspace="${DEV_WORKSPACE} \
               gateway sync /repository/output
   diff-staging:
     needs:
@@ -233,12 +230,11 @@ jobs:
 
       - name: Deck Diff on staging
         run: |
-          echo "-> Diff'ing against control plane '${KONNECT_CONTROL_PLANE_NAME_STAGING}' in region '${KONNECT_REGION}'"
-          deck --konnect-addr="https://${KONNECT_REGION}.api.konghq.com" \
-              --konnect-token="${KONNECT_API_KEY_STAGING}" \
-              --konnect-control-plane-name="${KONNECT_CONTROL_PLANE_NAME_STAGING}" \
+          deck --kong-addr="${KONG_ADMIN_URL" \
+              --headers="kong-admin-token:${KONG_ADMIN_TOKEN}" \
               --select-tag="${API_TAG}" \
-              gateway diff /repository/output
+              --workspace="${STAGING_WORKSPACE} \
+              gateway sync /repository/output
   sync-staging:
     needs:
       - diff-staging
@@ -344,11 +340,10 @@ jobs:
   
       - name: Deck Sync on staging
         run: |
-          echo "-> Sync'ing against control plane '${KONNECT_CONTROL_PLANE_NAME_STAGING}' in region '${KONNECT_REGION}'"
-          deck --konnect-addr="https://${KONNECT_REGION}.api.konghq.com" \
-              --konnect-token="${KONNECT_API_KEY_STAGING}" \
-              --konnect-control-plane-name="${KONNECT_CONTROL_PLANE_NAME_STAGING}" \
+          deck --kong-addr="${KONG_ADMIN_URL" \
+              --headers="kong-admin-token:${KONG_ADMIN_TOKEN}" \
               --select-tag="${API_TAG}" \
+              --workspace="${STAGING_WORKSPACE} \
               gateway sync /repository/output
   diff-production:
     needs:
@@ -453,11 +448,11 @@ jobs:
       - name: Deck Diff on production
         run: |
           echo "-> Diff'ing against control plane '${KONNECT_CONTROL_PLANE_NAME_PROD}' in region '${KONNECT_REGION}'"
-          deck --konnect-addr="https://${KONNECT_REGION}.api.konghq.com" \
-              --konnect-token="${KONNECT_API_KEY_PROD}" \
-              --konnect-control-plane-name="${KONNECT_CONTROL_PLANE_NAME_PROD}" \
+          deck --kong-addr="${KONG_ADMIN_URL" \
+              --headers="kong-admin-token:${KONG_ADMIN_TOKEN}" \
               --select-tag="${API_TAG}" \
-              gateway diff /repository/output
+              --workspace="${PROD_WORKSPACE} \
+              gateway sync /repository/output
   sync-production:
     needs:
       - diff-production
@@ -563,9 +558,8 @@ jobs:
 
       - name: Deck Sync on production
         run: |
-          echo "-> Sync'ing against control plane '${KONNECT_CONTROL_PLANE_NAME_PROD}' in region '${KONNECT_REGION}'"
-          deck --konnect-addr="https://${KONNECT_REGION}.api.konghq.com" \
-              --konnect-token="${KONNECT_API_KEY_PROD}" \
-              --konnect-control-plane-name="${KONNECT_CONTROL_PLANE_NAME_PROD}" \
+          deck --kong-addr="${KONG_ADMIN_URL" \
+              --headers="kong-admin-token:${KONG_ADMIN_TOKEN}" \
               --select-tag="${API_TAG}" \
+              --workspace="${PROD_WORKSPACE} \
               gateway sync /repository/output
