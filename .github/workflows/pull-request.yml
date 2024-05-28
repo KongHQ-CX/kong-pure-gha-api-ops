@@ -61,9 +61,8 @@ jobs:
       name: "dev"
 
     env:
-      KONNECT_API_KEY_DEV: ${{ secrets.KONNECT_API_KEY_DEV }}
-      KONNECT_CONTROL_PLANE_NAME_DEV: ${{ vars.KONNECT_CONTROL_PLANE_NAME_DEV }}
-      KONNECT_REGION: ${{ vars.KONNECT_REGION }}
+      KONG_ADMIN_URL: ${{ secrets.KONG_ADMIN_URL }}
+      KONG_ADMIN_TOKEN: ${{ secrets.KONG_ADMIN_TOKEN }}
       API_TAG: ${{ github.event.repository.name }}
       DEV_WORKSPACE: ${{ vars.DEV_WORKSPACE }}
 
