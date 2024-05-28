@@ -125,7 +125,7 @@ jobs:
           deck --kong-addr="${KONG_ADMIN_URL}" \
               --headers="kong-admin-token:${KONG_ADMIN_TOKEN}" \
               --select-tag="${API_TAG}" \
-              --workspace="${DEV_WORKSPACE} \
+              --workspace="${DEV_WORKSPACE}" \
               gateway sync /repository/output
   diff-staging:
     needs:
@@ -233,7 +233,7 @@ jobs:
           deck --kong-addr="${KONG_ADMIN_URL}" \
               --headers="kong-admin-token:${KONG_ADMIN_TOKEN}" \
               --select-tag="${API_TAG}" \
-              --workspace="${STAGING_WORKSPACE} \
+              --workspace="${STAGING_WORKSPACE}" \
               gateway sync /repository/output
   sync-staging:
     needs:
@@ -343,7 +343,7 @@ jobs:
           deck --kong-addr="${KONG_ADMIN_URL}" \
               --headers="kong-admin-token:${KONG_ADMIN_TOKEN}" \
               --select-tag="${API_TAG}" \
-              --workspace="${STAGING_WORKSPACE} \
+              --workspace="${STAGING_WORKSPACE}" \
               gateway sync /repository/output
   diff-production:
     needs:
@@ -451,7 +451,7 @@ jobs:
           deck --kong-addr="${KONG_ADMIN_URL}" \
               --headers="kong-admin-token:${KONG_ADMIN_TOKEN}" \
               --select-tag="${API_TAG}" \
-              --workspace="${PROD_WORKSPACE} \
+              --workspace="${PROD_WORKSPACE}" \
               gateway sync /repository/output
   sync-production:
     needs:
@@ -561,5 +561,5 @@ jobs:
           deck --kong-addr="${KONG_ADMIN_URL}" \
               --headers="kong-admin-token:${KONG_ADMIN_TOKEN}" \
               --select-tag="${API_TAG}" \
-              --workspace="${PROD_WORKSPACE} \
+              --workspace="${PROD_WORKSPACE}" \
               gateway sync /repository/output
