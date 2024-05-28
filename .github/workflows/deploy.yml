@@ -122,7 +122,7 @@ jobs:
 
       - name: Deck Sync on dev
         run: |
-          deck --kong-addr="${KONG_ADMIN_URL" \
+          deck --kong-addr="${KONG_ADMIN_URL}" \
               --headers="kong-admin-token:${KONG_ADMIN_TOKEN}" \
               --select-tag="${API_TAG}" \
               --workspace="${DEV_WORKSPACE} \
@@ -230,7 +230,7 @@ jobs:
 
       - name: Deck Diff on staging
         run: |
-          deck --kong-addr="${KONG_ADMIN_URL" \
+          deck --kong-addr="${KONG_ADMIN_URL}" \
               --headers="kong-admin-token:${KONG_ADMIN_TOKEN}" \
               --select-tag="${API_TAG}" \
               --workspace="${STAGING_WORKSPACE} \
@@ -340,7 +340,7 @@ jobs:
   
       - name: Deck Sync on staging
         run: |
-          deck --kong-addr="${KONG_ADMIN_URL" \
+          deck --kong-addr="${KONG_ADMIN_URL}" \
               --headers="kong-admin-token:${KONG_ADMIN_TOKEN}" \
               --select-tag="${API_TAG}" \
               --workspace="${STAGING_WORKSPACE} \
@@ -448,7 +448,7 @@ jobs:
       - name: Deck Diff on production
         run: |
           echo "-> Diff'ing against control plane '${KONNECT_CONTROL_PLANE_NAME_PROD}' in region '${KONNECT_REGION}'"
-          deck --kong-addr="${KONG_ADMIN_URL" \
+          deck --kong-addr="${KONG_ADMIN_URL}" \
               --headers="kong-admin-token:${KONG_ADMIN_TOKEN}" \
               --select-tag="${API_TAG}" \
               --workspace="${PROD_WORKSPACE} \
@@ -558,7 +558,7 @@ jobs:
 
       - name: Deck Sync on production
         run: |
-          deck --kong-addr="${KONG_ADMIN_URL" \
+          deck --kong-addr="${KONG_ADMIN_URL}" \
               --headers="kong-admin-token:${KONG_ADMIN_TOKEN}" \
               --select-tag="${API_TAG}" \
               --workspace="${PROD_WORKSPACE} \
