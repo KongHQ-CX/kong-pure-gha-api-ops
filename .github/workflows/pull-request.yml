@@ -168,7 +168,7 @@ jobs:
 
       - name: Deck Diff
         run: |
-          deck --kong-addr="${KONG_ADMIN_URL" \
+          deck --kong-addr="${KONG_ADMIN_URL}" \
               --headers="kong-admin-token:${KONG_ADMIN_TOKEN}" \
               --select-tag="${API_TAG}" \
               --workspace="${DEV_WORKSPACE} \
