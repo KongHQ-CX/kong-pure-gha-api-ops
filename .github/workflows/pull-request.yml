@@ -65,6 +65,7 @@ jobs:
       KONNECT_CONTROL_PLANE_NAME_DEV: ${{ vars.KONNECT_CONTROL_PLANE_NAME_DEV }}
       KONNECT_REGION: ${{ vars.KONNECT_REGION }}
       API_TAG: ${{ github.event.repository.name }}
+      DEV_WORKSPACE: ${{ vars.DEV_WORKSPACE }}
 
     runs-on: ubuntu-latest
 
@@ -167,13 +168,11 @@ jobs:
 
       - name: Deck Diff
         run: |
-          echo "-> Diff'ing against control plane '${KONNECT_CONTROL_PLANE_NAME_DEV}' in region '${KONNECT_REGION}'"
-
-          deck --konnect-addr="https://${KONNECT_REGION}.api.konghq.com" \
-               --konnect-token="${KONNECT_API_KEY_DEV}" \
-               --konnect-control-plane-name="${KONNECT_CONTROL_PLANE_NAME_DEV}" \
-               --select-tag="${API_TAG}" \
-               gateway diff /repository/output >> out.txt
+          deck --kong-addr="${KONG_ADMIN_URL" \
+              --headers="kong-admin-token:${KONG_ADMIN_TOKEN}" \
+              --select-tag="${API_TAG}" \
+              --workspace="${DEV_WORKSPACE} \
+              gateway sync /repository/output >> out.txt
 
           echo "-> Producing pull request comment"
 
