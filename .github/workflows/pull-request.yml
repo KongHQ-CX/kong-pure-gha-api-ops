@@ -4,6 +4,7 @@ on:
 
 jobs:
   lint-api-specs:
+    permissions: write-all
     environment:
       name: "dev"
 
