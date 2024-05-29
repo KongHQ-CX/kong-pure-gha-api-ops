@@ -37,13 +37,17 @@ jobs:
       - name: OpenAPI to Kong
         run: |
           mkdir -p /repository/output/
+
           echo "-> Generating decks from all API specs"
+
           for API_SPEC_PATH in /repository/apis/*.yaml; do
             export API_SPEC_FILENAME=$(basename $API_SPEC_PATH)
+
             deck file openapi2kong \
               -s $API_SPEC_PATH \
               -o /repository/output/$API_SPEC_FILENAME \
               --select-tag $API_TAG
+
             echo "-> Genarated Kong config from ${API_SPEC_FILENAME}"
           done
 
@@ -120,6 +124,7 @@ jobs:
               fi
             done
 
+
       - name: Deck Sync on dev
         run: |
           deck --kong-addr="${KONG_ADMIN_URL}" \
@@ -144,13 +149,17 @@ jobs:
       - name: OpenAPI to Kong
         run: |
           mkdir -p /repository/output/
+
           echo "-> Generating decks from all API specs"
+
           for API_SPEC_PATH in /repository/apis/*.yaml; do
             export API_SPEC_FILENAME=$(basename $API_SPEC_PATH)
+
             deck file openapi2kong \
               -s $API_SPEC_PATH \
               -o /repository/output/$API_SPEC_FILENAME \
               --select-tag $API_TAG
+
             echo "-> Genarated Kong config from ${API_SPEC_FILENAME}"
           done
 
@@ -234,7 +243,8 @@ jobs:
               --headers="kong-admin-token:${KONG_ADMIN_TOKEN}" \
               --select-tag="${API_TAG}" \
               --workspace="${STAGING_WORKSPACE}" \
-              gateway sync /repository/output
+              gateway diff /repository/output
+
   sync-staging:
     needs:
       - diff-staging
@@ -255,13 +265,17 @@ jobs:
       - name: OpenAPI to Kong
         run: |
           mkdir -p /repository/output/
+
           echo "-> Generating decks from all API specs"
+
           for API_SPEC_PATH in /repository/apis/*.yaml; do
             export API_SPEC_FILENAME=$(basename $API_SPEC_PATH)
+
             deck file openapi2kong \
               -s $API_SPEC_PATH \
               -o /repository/output/$API_SPEC_FILENAME \
               --select-tag $API_TAG
+
             echo "-> Genarated Kong config from ${API_SPEC_FILENAME}"
           done
 
@@ -337,7 +351,7 @@ jobs:
               mv plugins/$API_SPEC_FILENAME/routes.yaml output/routes-plugins.$API_SPEC_FILENAME
               fi
             done
-  
+
       - name: Deck Sync on staging
         run: |
           deck --kong-addr="${KONG_ADMIN_URL}" \
@@ -345,6 +359,7 @@ jobs:
               --select-tag="${API_TAG}" \
               --workspace="${STAGING_WORKSPACE}" \
               gateway sync /repository/output
+
   diff-production:
     needs:
       - sync-staging
@@ -362,13 +377,17 @@ jobs:
       - name: OpenAPI to Kong
         run: |
           mkdir -p /repository/output/
+
           echo "-> Generating decks from all API specs"
+
           for API_SPEC_PATH in /repository/apis/*.yaml; do
             export API_SPEC_FILENAME=$(basename $API_SPEC_PATH)
+
             deck file openapi2kong \
               -s $API_SPEC_PATH \
               -o /repository/output/$API_SPEC_FILENAME \
               --select-tag $API_TAG
+
             echo "-> Genarated Kong config from ${API_SPEC_FILENAME}"
           done
 
@@ -452,7 +471,8 @@ jobs:
               --headers="kong-admin-token:${KONG_ADMIN_TOKEN}" \
               --select-tag="${API_TAG}" \
               --workspace="${PROD_WORKSPACE}" \
-              gateway sync /repository/output
+              gateway diff /repository/output
+
   sync-production:
     needs:
       - diff-production
@@ -473,13 +493,17 @@ jobs:
       - name: OpenAPI to Kong
         run: |
           mkdir -p /repository/output/
+
           echo "-> Generating decks from all API specs"
+
           for API_SPEC_PATH in /repository/apis/*.yaml; do
             export API_SPEC_FILENAME=$(basename $API_SPEC_PATH)
+
             deck file openapi2kong \
               -s $API_SPEC_PATH \
               -o /repository/output/$API_SPEC_FILENAME \
               --select-tag $API_TAG
+
             echo "-> Genarated Kong config from ${API_SPEC_FILENAME}"
           done
 
