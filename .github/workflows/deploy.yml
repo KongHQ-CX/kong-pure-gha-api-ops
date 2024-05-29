@@ -12,7 +12,7 @@ on:
 
 env:
   KONG_ADMIN_URL: ${{ secrets.KONG_ADMIN_URL }}
-  KONG_ADMIN_TOKEN: ${{ vars.KONG_ADMIN_TOKEN }}
+  KONG_ADMIN_TOKEN: ${{ secrets.KONG_ADMIN_TOKEN }}
   API_TAG: ${{ github.event.repository.name }}
   DEV_WORKSPACE: ${{ vars.DEV_WORKSPACE }}
   STAGING_WORKSPACE: ${{ vars.STAGING_WORKSPACE }}
