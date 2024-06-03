@@ -68,9 +68,9 @@ end
 
 local answers, err, tries = r:query(
 
-  "google.com",                   -- <---- PUT THE ADDRESS TO TEST HERE -- --
+  "security-broker-orchestrator-service.rakbanktst.ae",                   -- <---- PUT THE ADDRESS TO TEST HERE -- --
 
-  { qtype = r.TYPE_A }, {})
+  { qtype = r.TYPE_CNAME }, {})
 if not answers then
     ngx.say("failed to query the DNS server: ", err)
     ngx.say("retry history:\n  ", table.concat(tries, "\n  "))
@@ -83,10 +83,14 @@ if answers.errcode then
 end
 
 for i, ans in ipairs(answers) do
-    print ('')
+  ngx.say(ans.name, " ", ans.address or ans.cname,
+  " type:", ans.type, " class:", ans.class,
+  " ttl:", ans.ttl)
+
+    print('')
     print('*****************************************************')
     print('**')
-    print('** TRYING: ' .. ans.address .. '                         **')
+    print('** TRYING: ' .. (ans.address or ans.cname) .. '                         **')
     print('**')
     print('*****************************************************')
 
@@ -94,10 +98,10 @@ for i, ans in ipairs(answers) do
     local http = require "resty.http"
     local httpc = http.new()
 
-    local res, err = httpc:request_uri("http://" .. ans.address .. ":9081/", {
+    local res, err = httpc:request_uri("http://" .. (ans.address or ans.cname) .. ":9081/", {
       method = "GET",
       headers = {
-          ["Host"] = "google.com",    -- <---- SAME ADDRESS HERE -- --
+          ["Host"] = "security-broker-orchestrator-service.rakbanktst.ae",    -- <---- SAME ADDRESS HERE -- --
       },
       ssl_verify = false,
     })
@@ -108,8 +112,6 @@ for i, ans in ipairs(answers) do
 
     -- At this point, the entire request / response is complete and the connection
     -- will be closed or back on the connection pool.
-
-    -- The `res` table contains the expeected `status`, `headers` and `body` fields.
     print(dump(res))
 end
 
