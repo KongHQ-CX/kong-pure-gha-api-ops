@@ -48,6 +48,20 @@ paths:
           description: Successfully returns an echo
         '500':
           $ref: '#/components/responses/500Error'
+    patch:
+      operationId: "echoPatch"
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: string
+      description: Returns a POST body echo
+      responses:
+        '200':
+          description: Successfully returns an echo
+        '500':
+          $ref: '#/components/responses/500Error'
 components:
   responses:
     500Error:
